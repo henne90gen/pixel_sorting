@@ -2,9 +2,9 @@ from img_manipulation import *
 
 
 def main():
-    filename = "pain.png"
+    filename = "tree.jpg"
     img = Image.open(filename)
-    pixels = sort(SortModes.RectangleSort, img, 60, 100, 100, 100)
+    pixels = sort(SortModes.CircleSort, img, x=50, y=50, radius=10)
     save_to_copy(img, pixels, "copy_" + filename)
 
 

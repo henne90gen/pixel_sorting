@@ -1,3 +1,5 @@
+import math
+
 from PIL import Image
 
 
@@ -8,6 +10,8 @@ class SortModes:
     BlueSort = 3
     BrightnessSort = 4
     RectangleSort = 5
+    CircleSort = 6
+    Invert = 7
 
 
 def pixels_to_linear_array(pixels, width, height):
@@ -33,7 +37,7 @@ def save_to_copy(img, pixels, filename):
     new_image.save(filename)
 
 
-def sort(sort_mode, img, x=0, y=0, width=0, height=0):
+def sort(sort_mode, img, x=0, y=0, width=0, height=0, radius=0):
     pixels = get_pixels(img)
     img_width = img.size[0]
     img_height = img.size[1]
@@ -49,6 +53,10 @@ def sort(sort_mode, img, x=0, y=0, width=0, height=0):
         pixels = sort_by_brightness(pixels)
     if SortModes.RectangleSort == sort_mode:
         pixels = sort_rectangle(pixels, img_width, img_height, x, y, width, height)
+    if SortModes.CircleSort == sort_mode:
+        pixels = sort_circle(pixels, img_width, img_height, x, y, radius)
+    if SortModes.Invert == sort_mode:
+        pixels = invert(pixels)
     return pixels
 
 
@@ -87,6 +95,38 @@ def sort_rectangle(pixels, img_width, img_height, x, y, width, height):
     return pixels
 
 
+def invert(pixels):
+    for i in range(len(pixels)):
+        r = 255 - pixels[i][0]
+        g = 255 - pixels[i][1]
+        b = 255 - pixels[i][2]
+        pixels[i] = (r, g, b)
+    return pixels
+
+
 def sort_circle(pixels, img_width, img_height, x, y, radius):
-    # TODO implement this
+    sorting = []
+    # if
+    for row in range(y - radius, y + radius):
+        angle = 0
+        if row < y:
+            angle = math.asin(y - row)
+        if row > y:
+            angle = math.asin(row - y)
+        for col in range(x - math.cos(angle) * radius, x + math.cos(angle) * radius):
+            sorting.append(pixels[row * img_width + col])
+
+    sorting.sort()
+
+    index = 0
+    for row in range(y - radius, y + radius):
+        angle = 0
+        if row < y:
+            angle = math.asin(y - row)
+        if row > y:
+            angle = math.asin(row - y)
+        for col in range(x - math.cos(angle) * radius, x + math.cos(angle) * radius):
+            pixels[row * img_width + col] = sorting[index]
+            index += 1
+
     return pixels
