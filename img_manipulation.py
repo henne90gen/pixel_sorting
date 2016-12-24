@@ -3,17 +3,6 @@ import math
 from PIL import Image
 
 
-class SortModes:
-    BuiltInSort = 0
-    RedSort = 1
-    GreenSort = 2
-    BlueSort = 3
-    BrightnessSort = 4
-    RectangleSort = 5
-    CircleSort = 6
-    Invert = 7
-
-
 def pixels_to_linear_array(pixels, width, height):
     result = []
     for y in range(height):
@@ -37,40 +26,24 @@ def save_to_copy(img, pixels, filename):
     new_image.save(filename)
 
 
-def sort(sort_mode, img, x=0, y=0, width=0, height=0, radius=0):
-    pixels = get_pixels(img)
-    img_width = img.size[0]
-    img_height = img.size[1]
-    if SortModes.BuiltInSort == sort_mode:
-        pixels.sort()
-    if SortModes.RedSort == sort_mode:
-        pixels.sort(key=lambda pixel: pixel[0])
-    if SortModes.GreenSort == sort_mode:
-        pixels.sort(key=lambda pixel: pixel[1])
-    if SortModes.BlueSort == sort_mode:
-        pixels.sort(key=lambda pixel: pixel[2])
-    if SortModes.BrightnessSort == sort_mode:
-        pixels = sort_by_brightness(pixels)
-    if SortModes.RectangleSort == sort_mode:
-        pixels = sort_rectangle(pixels, img_width, img_height, x, y, width, height)
-    if SortModes.CircleSort == sort_mode:
-        pixels = sort_circle(pixels, img_width, img_height, x, y, radius)
-    if SortModes.Invert == sort_mode:
-        pixels = invert(pixels)
-    return pixels
+# def sort(sort_mode, sort_criteria, img, x=0, y=0, width=0, height=0, radius=0, row=0, col=0):
+#     pixels = get_pixels(img)
+#     img_width = img.size[0]
+#     img_height = img.size[1]
+#
+# if SortMode.All == sort_mode:
+#     if sort_criteria is not None:
+#         pixels.sort(key=sort_criteria.key)
+# if SortMode.RectangleSort == sort_mode:
+#     pixels = sort_rectangle(pixels, sort_criteria, img_width, img_height, x, y, width, height)
+# if SortMode.CircleSort == sort_mode:
+#     pixels = sort_circle(pixels, sort_criteria, img_width, img_height, x, y, radius)
+# if SortMode.Invert == sort_mode:
+#     pixels = invert(pixels)
+# return pixels
 
 
-def sort_by_brightness(pixels):
-    brightness = []
-    for pixel in pixels:
-        b = pixel[0] * 0.299 + pixel[1] * 0.587 + pixel[2] * 0.114
-        brightness.append((b, pixel))
-    brightness.sort(key=lambda tup: tup[0])
-    pixels = [pixel[1] for pixel in brightness]
-    return pixels
-
-
-def sort_rectangle(pixels, img_width, img_height, x, y, width, height):
+def sort_rectangle(pixels, sort_criteria, img_width, img_height, x, y, width, height):
     sorting = []
 
     if y > img_height or x > img_width:
@@ -84,7 +57,7 @@ def sort_rectangle(pixels, img_width, img_height, x, y, width, height):
         for col in range(x, x + width):
             sorting.append(pixels[row * img_width + col])
 
-    sorting.sort()
+    sorting.sort(key=sort_criteria.key)
 
     index = 0
     for row in range(y, y + height):
@@ -95,38 +68,58 @@ def sort_rectangle(pixels, img_width, img_height, x, y, width, height):
     return pixels
 
 
-def invert(pixels):
-    for i in range(len(pixels)):
-        r = 255 - pixels[i][0]
-        g = 255 - pixels[i][1]
-        b = 255 - pixels[i][2]
-        pixels[i] = (r, g, b)
-    return pixels
-
-
-def sort_circle(pixels, img_width, img_height, x, y, radius):
+def sort_circle(pixels, sort_criteria, img_width, img_height, x, y, radius):
     sorting = []
-    # if
     for row in range(y - radius, y + radius):
         angle = 0
         if row < y:
-            angle = math.asin(y - row)
+            angle = math.asin((y - row) / radius)
         if row > y:
-            angle = math.asin(row - y)
-        for col in range(x - math.cos(angle) * radius, x + math.cos(angle) * radius):
+            angle = math.asin((row - y) / radius)
+        for col in range(int(x - math.cos(angle) * radius), int(x + math.cos(angle) * radius)):
             sorting.append(pixels[row * img_width + col])
 
-    sorting.sort()
+    sorting.sort(key=sort_criteria.key)
 
     index = 0
     for row in range(y - radius, y + radius):
         angle = 0
         if row < y:
-            angle = math.asin(y - row)
+            angle = math.asin((y - row) / radius)
         if row > y:
-            angle = math.asin(row - y)
-        for col in range(x - math.cos(angle) * radius, x + math.cos(angle) * radius):
+            angle = math.asin((row - y) / radius)
+        for col in range(int(x - math.cos(angle) * radius), int(x + math.cos(angle) * radius)):
             pixels[row * img_width + col] = sorting[index]
             index += 1
+
+    return pixels
+
+
+def sort_row(pixels, sort_criteria, row, img_width, reverse=False):
+    sorting = []
+    for col in range(img_width):
+        sorting.append(pixels[row * img_width + col])
+
+    sorting.sort(key=sort_criteria.key, reverse=reverse)
+
+    index = 0
+    for col in range(img_width):
+        pixels[row * img_width + col] = sorting[index]
+        index += 1
+
+    return pixels
+
+
+def sort_column(pixels, sort_criteria, col, img_width, img_height, reverse=False):
+    sorting = []
+    for row in range(img_height):
+        sorting.append(pixels[row * img_width + col])
+
+    sorting.sort(key=sort_criteria.key, reverse=reverse)
+
+    index = 0
+    for row in range(img_height):
+        pixels[row * img_width + col] = sorting[index]
+        index += 1
 
     return pixels
