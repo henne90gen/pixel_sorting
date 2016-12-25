@@ -1,7 +1,7 @@
 
 .idea/
 __pycache__/
-copy_planetside.jpg
-copy_team-fortress.jpg
-planetside.jpg
-team-fortress.jpg
+res/copy_planetside.jpg
+res/copy_team-fortress.jpg
+res/planetside.jpg
+res/team-fortress.jpg
