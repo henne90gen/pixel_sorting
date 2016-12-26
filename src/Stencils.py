@@ -84,7 +84,6 @@ class CircleStencil(Stencil):
         return result
 
     def put_in_pixels(self, pixels, rect_pixels):
-        result = [pixel for pixel in pixels]
         index = 0
         begin = int(self.y - self.radius)
         end = int(self.y + self.radius)
@@ -104,6 +103,6 @@ class CircleStencil(Stencil):
             begin = self.x - cathetus
             end = self.x + cathetus
             for col in range(begin, end + 1):
-                result[row * self.img_width + col] = rect_pixels[index]
+                pixels[row * self.img_width + col] = rect_pixels[index]
                 index += 1
-        return result
+        return pixels

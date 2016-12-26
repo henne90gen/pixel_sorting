@@ -66,7 +66,7 @@ class AlternatingRowSorter(PixelSorter):
         reverse = False
         for i in range(self.img_height):
             row_sorter = RowSorter(self.img_width, self.img_height, self.sort_criteria, i, reverse)
-            pixels = row_sorter.sort_pixels(pixels)
+            row_sorter.sort_pixels(pixels)
             if i % self.alternation == 0:
                 reverse = not reverse
         return pixels
@@ -89,7 +89,6 @@ class ColumnSorter(PixelSorter):
         for row in range(self.img_height):
             pixels[row * self.img_width + self.column] = sorting[index]
             index += 1
-
         return pixels
 
 
