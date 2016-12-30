@@ -1,11 +1,11 @@
 import os
 import unittest
 
-from PixelFun.src.helper import *
+from pixel_sorting.helper import *
 
 
 class HelperTest(unittest.TestCase):
-    def test_save_to_copy(self):
+    def testSaveToCopy(self):
         filename = "test_image.png"
         img = Image.open(filename)
         pixels = get_pixels(img)

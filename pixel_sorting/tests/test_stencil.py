@@ -1,11 +1,7 @@
 import unittest
 
 from PIL import Image
-
-from PixelFun import src
-
-
-# from src.Stencils import *
+from pixel_sorting import *
 
 
 class StencilTests(unittest.TestCase):
@@ -15,7 +11,7 @@ class StencilTests(unittest.TestCase):
     stencil_input_pixels = []
 
     def testStencil(self):
-        stencil = src.Stencil(4, 4, 2, 2)
+        stencil = Stencil(4, 4, 2, 2)
         self.assertEqual(stencil.cut_out_pixels(self.stencil_pixels), None)
         self.assertEqual(stencil.cut_out_image(self.stencil_img), None)
         self.assertEqual(stencil.put_in_pixels(self.stencil_pixels, self.stencil_input_pixels), None)
@@ -29,7 +25,7 @@ class StencilTests(unittest.TestCase):
     def testRectangle(self):
         reference_pixels = [p for p in self.rect_pixels]
 
-        rect = src.RectangleStencil(4, 4, 1, 1, 2, 2)
+        rect = RectangleStencil(4, 4, 1, 1, 2, 2)
         self.assertEqual(rect.cut_out_pixels(self.rect_pixels), self.rect_out_result)
         self.assertEqual(self.rect_pixels, reference_pixels)
 
@@ -61,7 +57,7 @@ class StencilTests(unittest.TestCase):
 
     def testCirlce(self):
         reference_pixels = [p for p in self.circ_pixels]
-        circle = src.CircleStencil(5, 5, 2, 2, 1)
+        circle = CircleStencil(5, 5, 2, 2, 1)
         self.assertEqual(circle.cut_out_pixels(self.circ_pixels), self.circ_out_result1)
         self.assertEqual(self.circ_pixels, reference_pixels)
 
