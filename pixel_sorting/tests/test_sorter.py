@@ -118,7 +118,7 @@ class SorterTests(unittest.TestCase):
         circle_sorter = CircleSorter(5, 5, SortCriteria.built_in())
 
         print()
-        print("First test done")
+        print("First tests done")
         print()
 
         test_pixels = [p for p in self.circle_pixels]

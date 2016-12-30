@@ -1,3 +1,5 @@
+from pixel_sorting import *
+
 def main():
     filename = "team-fortress.jpg"
     img = Image.open("res/" + filename)

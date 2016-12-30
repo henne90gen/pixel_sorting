@@ -1,6 +1,6 @@
 import math
 
-from pixel_sorting.src.helper import *
+from . import get_pixels
 
 
 class Stencil(object):

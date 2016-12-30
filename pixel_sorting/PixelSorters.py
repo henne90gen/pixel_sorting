@@ -1,5 +1,6 @@
 import math
-import
+
+from . import get_pixels, SortCriteria
 
 
 class PixelSorter(object):
