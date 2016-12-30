@@ -1,13 +1,12 @@
 import unittest
 
-from PIL import Image
 from pixel_sorting import *
 
 
 class StencilTests(unittest.TestCase):
 
     stencil_pixels = []
-    stencil_img = Image.open("test_image.png")
+    stencil_img = Image.open("./pixel_sorting/tests/test_image.png")
     stencil_input_pixels = []
 
     def testStencil(self):

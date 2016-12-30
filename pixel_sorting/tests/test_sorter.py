@@ -4,7 +4,7 @@ from pixel_sorting import *
 
 
 class SorterTests(unittest.TestCase):
-    sorter_img = Image.open("test_image.png")
+    sorter_img = Image.open("./pixel_sorting/tests/test_image.png")
     sorter_pixels = []
 
     def testPixelSorter(self):
@@ -117,10 +117,10 @@ class SorterTests(unittest.TestCase):
     def testCircleSorter(self):
         circle_sorter = CircleSorter(5, 5, SortCriteria.built_in())
 
-        print()
-        print("First tests done")
-        print()
+        # print()
+        # print("First tests done")
+        # print()
 
-        test_pixels = [p for p in self.circle_pixels]
+        # test_pixels = [p for p in self.circle_pixels]
         # self.assertEqual(circle_sorter.sort_pixels(test_pixels), self.circle_result)
         # self.assertEqual(test_pixels, self.circle_result)

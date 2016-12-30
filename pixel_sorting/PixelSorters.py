@@ -1,6 +1,7 @@
 import math
 
-from . import get_pixels, SortCriteria
+import pixel_sorting.SortCriteria as SortCriteria
+from .helper import get_pixels
 
 
 class PixelSorter(object):
