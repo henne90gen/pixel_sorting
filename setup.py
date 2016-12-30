@@ -8,4 +8,6 @@ setup(name='pixel_sorting',
       author_email='henne90gen@gmail.com',
       license='GPL',
       packages=['pixel_sorting'],
-      zip_safe=False, install_requires=['Pillow'])
+      zip_safe=False,
+      test_suite="pixel_sorting.tests",
+      install_requires=['Pillow'])
