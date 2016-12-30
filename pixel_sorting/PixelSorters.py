@@ -1,7 +1,5 @@
 import math
-
-from src.helper import *
-import SortCriteria
+import
 
 
 class PixelSorter(object):

@@ -1,8 +1,3 @@
-from src.PixelSorters import *
-
-from src.Stencils import *
-
-
 def main():
     filename = "team-fortress.jpg"
     img = Image.open("res/" + filename)

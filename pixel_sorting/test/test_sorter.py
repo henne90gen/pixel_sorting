@@ -1,6 +1,6 @@
 import unittest
 
-from PixelSorters import *
+from src.PixelSorters import *
 
 
 class SorterTests(unittest.TestCase):

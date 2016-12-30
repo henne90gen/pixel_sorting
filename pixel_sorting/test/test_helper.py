@@ -1,6 +1,7 @@
 import os
 import unittest
-from helper import *
+
+from PixelFun.src.helper import *
 
 
 class HelperTest(unittest.TestCase):
