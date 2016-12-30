@@ -3,5 +3,9 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-install: pip install .
-script: python -m unittest
+install:
+  - pip install .
+  - pip install coveralls
+script: coverage run --source=pixel_sorting python -m unittest
+after_success:
+  coveralls
