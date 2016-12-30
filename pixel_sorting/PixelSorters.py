@@ -109,44 +109,49 @@ class AlternatingColumnSorter(PixelSorter):
         return pixels
 
 
-class CircleSorter(PixelSorter):
-    def __init__(self, img_width, img_height, sort_criteria):
+class DiamondSorter(PixelSorter):
+    def __init__(self, img_width, img_height, sort_criteria, reverse):
         super().__init__(img_width, img_height, sort_criteria)
-        self.x = int(img_width / 2)
-        self.y = int(img_height / 2)
-        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
+        self.reverse = reverse
+        self.x = round(img_width / 2)
+        self.y = round(img_height / 2)
+
+    def next_position(self, pos):
+        x = pos[0]
+        y = pos[1]
+        if x == 0 and y == 0:
+            return 1, 0
+        angle = math.atan2(y, x)
+        if 0 <= angle < math.pi / 2:
+            x -= 1
+            y += 1
+        elif math.pi / 2 <= angle < math.pi:
+            x -= 1
+            y -= 1
+        elif -math.pi <= angle < -math.pi / 2 or angle == math.pi:
+            x += 1
+            y -= 1
+        elif -math.pi / 2 <= angle < 0:
+            x += 1
+            y += 1
+        if y == 0 and x >= 0:
+            x += 1
+        pos = (x, y)
+        return pos
 
     def sort_pixels(self, pixels):
-        pixels.sort(key=self.sort_criteria, reverse=True)
+        pixels.sort(key=self.sort_criteria, reverse=self.reverse)
 
         temp_pixels = [p for p in pixels]
         index = 0
-        pixels[self.y * self.img_width + self.x] = temp_pixels[index]
-        x = 1
-        y = 0
+        pos = (0, 0)
         while True:
-            angle = math.atan2(y, x)
-            print("Angle:", angle, "X:", x, "Y:", y)
-            if 0 <= angle < math.pi / 2:
-                x -= 1
-                y += 1
-            elif math.pi / 2 <= angle < math.pi:
-                x -= 1
-                y -= 1
-            elif -math.pi <= angle < -math.pi / 2 or angle == math.pi:
-                x += 1
-                y -= 1
-            elif -math.pi / 2 <= angle < 0:
-                x += 1
-                y += 1
-            real_x = x + self.x
-            real_y = y + self.y
-            radius = math.sqrt(x * x + y * y)
-            if radius > self.max_radius:
+            real_x = pos[0] + self.x
+            real_y = pos[1] + self.y
+            if index >= len(temp_pixels):
                 break
-            if 0 <= real_x < self.img_width and 0 <= real_y < self.img_height and index + 1 < len(temp_pixels):
-                index += 1
-                print(index)
+            if 0 <= real_x < self.img_width and 0 <= real_y < self.img_height:
                 pixels[real_y * self.img_width + real_x] = temp_pixels[index]
-
+                index += 1
+            pos = self.next_position(pos)
         return pixels

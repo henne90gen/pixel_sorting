@@ -1,7 +1,8 @@
-
 .idea/
 __pycache__/
-res/copy_planetside.jpg
-res/copy_team-fortress.jpg
-res/planetside.jpg
-res/team-fortress.jpg
+res/
+*.egg-info
+.cache/
+pixel_sorting/PixelSorters.pyc
+pixel_sorting/SortCriteria.pyc
+pixel_sorting/__init__.pyc

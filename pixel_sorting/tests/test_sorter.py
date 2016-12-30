@@ -4,13 +4,12 @@ from pixel_sorting import *
 
 
 class SorterTests(unittest.TestCase):
-    sorter_img = Image.open("./pixel_sorting/tests/test_image.png")
-    sorter_pixels = []
-
     def testPixelSorter(self):
         sorter = PixelSorter()
-        self.assertEqual(sorter.sort_image(self.sorter_img), None)
-        self.assertEqual(sorter.sort_pixels(self.sorter_pixels), None)
+        sorter_img = Image.open("./pixel_sorting/tests/test_image.png")
+        sorter_pixels = []
+        self.assertEqual(sorter.sort_image(sorter_img), None)
+        self.assertEqual(sorter.sort_pixels(sorter_pixels), None)
 
     inverter_pixels = [(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 255)]
     inverter_result = [(255, 255, 255), (0, 255, 255), (255, 0, 255), (255, 255, 0), (0, 0, 0)]
@@ -111,16 +110,61 @@ class SorterTests(unittest.TestCase):
         self.assertEqual(col_sorter.sort_pixels(test_pixels), self.alt_col_result)
         self.assertEqual(test_pixels, self.alt_col_result)
 
-    circle_pixels = [p for p in range(1, 26)]
-    circle_result = []
+    diamond_pixels = [p for p in range(1, 26)]
+    diamond_result = [24, 19, 12, 20, 25,
+                      18, 11, 5, 13, 21,
+                      10, 4, 1, 2, 6,
+                      17, 9, 3, 7, 14,
+                      23, 16, 8, 15, 22]
 
-    def testCircleSorter(self):
-        circle_sorter = CircleSorter(5, 5, SortCriteria.built_in())
+    def testDiamondSorter(self):
+        diamond_sorter = DiamondSorter(5, 5, SortCriteria.built_in(), False)
 
-        # print()
-        # print("First tests done")
-        # print()
+        self.assertEqual(diamond_sorter.next_position((0, 0)), (1, 0))
+        self.assertEqual(diamond_sorter.next_position((1, 0)), (0, 1))
+        self.assertEqual(diamond_sorter.next_position((0, 1)), (-1, 0))
+        self.assertEqual(diamond_sorter.next_position((-1, 0)), (0, -1))
+        self.assertEqual(diamond_sorter.next_position((0, -1)), (2, 0))
 
-        # test_pixels = [p for p in self.circle_pixels]
-        # self.assertEqual(circle_sorter.sort_pixels(test_pixels), self.circle_result)
-        # self.assertEqual(test_pixels, self.circle_result)
+        self.assertEqual(diamond_sorter.next_position((2, 0)), (1, 1))
+        self.assertEqual(diamond_sorter.next_position((1, 1)), (0, 2))
+        self.assertEqual(diamond_sorter.next_position((0, 2)), (-1, 1))
+        self.assertEqual(diamond_sorter.next_position((-1, 1)), (-2, 0))
+        self.assertEqual(diamond_sorter.next_position((-2, 0)), (-1, -1))
+        self.assertEqual(diamond_sorter.next_position((-1, -1)), (0, -2))
+        self.assertEqual(diamond_sorter.next_position((0, -2)), (1, -1))
+        self.assertEqual(diamond_sorter.next_position((1, -1)), (3, 0))
+
+        self.assertEqual(diamond_sorter.next_position((3, 0)), (2, 1))
+        self.assertEqual(diamond_sorter.next_position((2, 1)), (1, 2))
+        self.assertEqual(diamond_sorter.next_position((1, 2)), (0, 3))
+        self.assertEqual(diamond_sorter.next_position((0, 3)), (-1, 2))
+        self.assertEqual(diamond_sorter.next_position((-1, 2)), (-2, 1))
+        self.assertEqual(diamond_sorter.next_position((-2, 1)), (-3, 0))
+        self.assertEqual(diamond_sorter.next_position((-3, 0)), (-2, -1))
+        self.assertEqual(diamond_sorter.next_position((-2, -1)), (-1, -2))
+        self.assertEqual(diamond_sorter.next_position((-1, -2)), (0, -3))
+        self.assertEqual(diamond_sorter.next_position((0, -3)), (1, -2))
+        self.assertEqual(diamond_sorter.next_position((1, -2)), (2, -1))
+        self.assertEqual(diamond_sorter.next_position((2, -1)), (4, 0))
+
+        self.assertEqual(diamond_sorter.next_position((4, 0)), (3, 1))
+        self.assertEqual(diamond_sorter.next_position((3, 1)), (2, 2))
+        self.assertEqual(diamond_sorter.next_position((2, 2)), (1, 3))
+        self.assertEqual(diamond_sorter.next_position((1, 3)), (0, 4))
+        self.assertEqual(diamond_sorter.next_position((0, 4)), (-1, 3))
+        self.assertEqual(diamond_sorter.next_position((-1, 3)), (-2, 2))
+        self.assertEqual(diamond_sorter.next_position((-2, 2)), (-3, 1))
+        self.assertEqual(diamond_sorter.next_position((-3, 1)), (-4, 0))
+        self.assertEqual(diamond_sorter.next_position((-4, 0)), (-3, -1))
+        self.assertEqual(diamond_sorter.next_position((-3, -1)), (-2, -2))
+        self.assertEqual(diamond_sorter.next_position((-2, -2)), (-1, -3))
+        self.assertEqual(diamond_sorter.next_position((-1, -3)), (0, -4))
+        self.assertEqual(diamond_sorter.next_position((0, -4)), (1, -3))
+        self.assertEqual(diamond_sorter.next_position((1, -3)), (2, -2))
+        self.assertEqual(diamond_sorter.next_position((2, -2)), (3, -1))
+        self.assertEqual(diamond_sorter.next_position((3, -1)), (5, 0))
+
+        test_pixels = [p for p in self.diamond_pixels]
+        self.assertEqual(diamond_sorter.sort_pixels(test_pixels), self.diamond_result)
+        self.assertEqual(test_pixels, self.diamond_result)
