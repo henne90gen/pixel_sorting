@@ -1,4 +1,3 @@
-
 def built_in():
     return lambda pixel: pixel
 
@@ -22,4 +21,19 @@ def brightness():
 def avg():
     return lambda pixel: (pixel[0] + pixel[1] + pixel[2]) / 3
 
-# TODO create more criteria
+
+# http://www.rapidtables.com/convert/color/rgb-to-hsl.htm
+def hue():
+    return lambda pixel: 0 if max(pixel) - min(pixel) == 0 else (
+        60 * (((pixel[1] - pixel[2]) / (max(pixel) - min(pixel))) % 6) if max(pixel) == pixel[0] else (
+            60 * ((pixel[2] - pixel[0]) / (max(pixel) - min(pixel)) + 2) if max(pixel) == pixel[1] else (
+                60 * ((pixel[0] - pixel[1]) / (max(pixel) - min(pixel)) + 4))))
+
+
+def saturation():
+    return lambda pixel: 0 if max(pixel) - min(pixel) == 0 else ((max(pixel) - min(pixel)) / 255) / (
+        1 - abs(((max(pixel) + min(pixel)) / 255) - 1))
+
+
+def lightness():
+    return lambda pixel: (max(pixel) / 255 + min(pixel) / 255) / 2
