@@ -1,6 +1,4 @@
-import unittest
-
-from pixel_sorting import *
+from .test_helper import *
 
 
 class SorterTests(unittest.TestCase):
@@ -30,34 +28,22 @@ class SorterTests(unittest.TestCase):
 
     def testBasicSorter(self):
         basic_sorter = BasicSorter(SortCriteria.built_in())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_builtin_result)
-        self.assertEqual(test_pixels, self.basic_builtin_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_builtin_result)
 
         basic_sorter = BasicSorter(SortCriteria.red())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_red_result)
-        self.assertEqual(test_pixels, self.basic_red_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_red_result)
 
         basic_sorter = BasicSorter(SortCriteria.green())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_green_result)
-        self.assertEqual(test_pixels, self.basic_green_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_green_result)
 
         basic_sorter = BasicSorter(SortCriteria.blue())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_blue_result)
-        self.assertEqual(test_pixels, self.basic_blue_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_blue_result)
 
         basic_sorter = BasicSorter(SortCriteria.brightness())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_brightness_result)
-        self.assertEqual(test_pixels, self.basic_brightness_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_brightness_result)
 
         basic_sorter = BasicSorter(SortCriteria.avg())
-        test_pixels = [p for p in self.basic_pixels]
-        self.assertEqual(basic_sorter.sort_pixels(test_pixels), self.basic_avg_result)
-        self.assertEqual(test_pixels, self.basic_avg_result)
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_avg_result)
 
     row_pixels = [4, 2, 3, 5, 1,
                   3, 1, 5, 2, 4]
@@ -68,23 +54,17 @@ class SorterTests(unittest.TestCase):
 
     def testRowSorter(self):
         row_sorter = RowSorter(5, 2, SortCriteria.built_in(), 0)
-        test_pixels = [p for p in self.row_pixels]
-        self.assertEqual(row_sorter.sort_pixels(test_pixels), self.row_result1)
-        self.assertEqual(test_pixels, self.row_result1)
+        execute_sorter(self, row_sorter, self.row_pixels, self.row_result1)
 
         row_sorter = RowSorter(5, 2, SortCriteria.built_in(), 1, True)
-        test_pixels = [p for p in self.row_pixels]
-        self.assertEqual(row_sorter.sort_pixels(test_pixels), self.row_result2)
-        self.assertEqual(test_pixels, self.row_result2)
+        execute_sorter(self, row_sorter, self.row_pixels, self.row_result2)
 
     alt_pixels = [p for p in range(1, 26)]
     alt_row_result = [1, 2, 3, 4, 5, 10, 9, 8, 7, 6, 11, 12, 13, 14, 15, 20, 19, 18, 17, 16, 21, 22, 23, 24, 25]
 
     def testAlternatingRowSorter(self):
         row_sorter = AlternatingRowSorter(5, 5, SortCriteria.built_in(), 1)
-        test_pixels = [p for p in self.alt_pixels]
-        self.assertEqual(row_sorter.sort_pixels(test_pixels), self.alt_row_result)
-        self.assertEqual(test_pixels, self.alt_row_result)
+        execute_sorter(self, row_sorter, self.alt_pixels, self.alt_row_result)
 
     col_pixels = [4, 7, 3, 9, 1, 6, 5, 8, 2, 10]
     col_result1 = [1, 7, 2, 9, 3, 6, 4, 8, 5, 10]
@@ -92,23 +72,17 @@ class SorterTests(unittest.TestCase):
 
     def testColumnSorter(self):
         col_sorter = ColumnSorter(2, 5, SortCriteria.built_in(), 0, False)
-        test_pixels = [p for p in self.col_pixels]
-        self.assertEqual(col_sorter.sort_pixels(test_pixels), self.col_result1)
-        self.assertEqual(test_pixels, self.col_result1)
+        execute_sorter(self, col_sorter, self.col_pixels, self.col_result1)
 
         col_sorter.column = 1
         col_sorter.reverse = True
-        test_pixels = [p for p in self.col_pixels]
-        self.assertEqual(col_sorter.sort_pixels(test_pixels), self.col_result2)
-        self.assertEqual(test_pixels, self.col_result2)
+        execute_sorter(self, col_sorter, self.col_pixels, self.col_result2)
 
     alt_col_result = [1, 22, 3, 24, 5, 6, 17, 8, 19, 10, 11, 12, 13, 14, 15, 16, 7, 18, 9, 20, 21, 2, 23, 4, 25]
 
     def testAlternatingColumnSorter(self):
         col_sorter = AlternatingColumnSorter(5, 5, SortCriteria.built_in(), 1)
-        test_pixels = [p for p in self.alt_pixels]
-        self.assertEqual(col_sorter.sort_pixels(test_pixels), self.alt_col_result)
-        self.assertEqual(test_pixels, self.alt_col_result)
+        execute_sorter(self, col_sorter, self.alt_pixels, self.alt_col_result)
 
     diamond_pixels = [p for p in range(1, 26)]
     diamond_result = [24, 19, 12, 20, 25,
@@ -165,6 +139,82 @@ class SorterTests(unittest.TestCase):
         self.assertEqual(diamond_sorter.next_position((2, -2)), (3, -1))
         self.assertEqual(diamond_sorter.next_position((3, -1)), (5, 0))
 
-        test_pixels = [p for p in self.diamond_pixels]
-        self.assertEqual(diamond_sorter.sort_pixels(test_pixels), self.diamond_result)
-        self.assertEqual(test_pixels, self.diamond_result)
+        execute_sorter(self, diamond_sorter, self.diamond_pixels, self.diamond_result)
+
+    pixel_source = [p for p in range(50, 99)]
+    circle_pixels = [p for p in range(1, 26)]
+    circle_pixel_result = [1, 2, 3, 4, 5,
+                           6, 7, 8, 9, 10,
+                           11, 12, 13, 50, 15,
+                           16, 17, 18, 19, 20,
+                           21, 22, 23, 24, 25]
+    circle_octant_result1 = [1, 2, 3, 4, 5,
+                             6, 7, 53, 9, 10,
+                             11, 51, 13, 50, 15,
+                             16, 17, 52, 19, 20,
+                             21, 22, 23, 24, 25]
+    circle_octant_result2 = [1, 2, 3, 4, 5,
+                             6, 52, 8, 53, 10,
+                             11, 12, 13, 14, 15,
+                             16, 51, 18, 50, 20,
+                             21, 22, 23, 24, 25]
+    circle_octant_result3 = [1, 57, 3, 55, 5,
+                             52, 7, 8, 9, 53,
+                             11, 12, 13, 14, 15,
+                             51, 17, 18, 19, 50,
+                             21, 56, 23, 54, 25]
+    circle_radius_result1 = [1, 2, 3, 4, 5,
+                             6, 7, 53, 9, 10,
+                             11, 51, 13, 50, 15,
+                             16, 17, 52, 19, 20,
+                             21, 22, 23, 24, 25]
+    circle_radius_result2 = [1, 2, 3, 4, 5,
+                             6, 56, 53, 57, 10,
+                             11, 51, 13, 50, 15,
+                             16, 55, 52, 54, 20,
+                             21, 22, 23, 24, 25]
+    circle_radius_result3 = [1, 61, 53, 59, 5,
+                             56, 7, 8, 9, 57,
+                             51, 12, 13, 14, 50,
+                             55, 17, 18, 19, 54,
+                             21, 60, 52, 58, 25]
+    circle_radius_result4 = [1, 61, 53, 59, 5,
+                             56, 7, 8, 9, 57,
+                             51, 12, 13, 14, 50,
+                             55, 17, 18, 19, 54,
+                             21, 60, 52, 58, 25]
+    circle_radius_result5 = [52, 2, 3, 4, 53,
+                             6, 7, 8, 9, 10,
+                             11, 12, 13, 14, 15,
+                             16, 17, 18, 19, 20,
+                             51, 22, 23, 24, 50]
+    circle_result = [24, 21, 13, 19, 25,
+                     16, 8, 5, 9, 17,
+                     11, 3, 1, 2, 10,
+                     15, 7, 4, 6, 14,
+                     23, 20, 12, 18, 22]
+
+    def testCircleSorter(self):
+        circle_sorter = CircleSorter(5, 5, SortCriteria.built_in())
+
+        execute_draw_pixel(self, circle_sorter, 1, 0, 0, self.circle_pixel_result, 1)
+        execute_draw_pixel(self, circle_sorter, 3, 0, 0, self.circle_pixels, 0)
+        execute_draw_pixel(self, circle_sorter, -3, 0, 0, self.circle_pixels, 0)
+        execute_draw_pixel(self, circle_sorter, 0, -3, 0, self.circle_pixels, 0)
+        execute_draw_pixel(self, circle_sorter, -3, -3, 0, self.circle_pixels, 0)
+        execute_draw_pixel(self, circle_sorter, 0, 0, len(self.pixel_source), self.circle_pixels, 0)
+
+        execute_draw_octants(self, circle_sorter, 1, 0, self.circle_octant_result1, 4)
+        execute_draw_octants(self, circle_sorter, 1, 1, self.circle_octant_result2, 4)
+        execute_draw_octants(self, circle_sorter, 2, 1, self.circle_octant_result3, 8)
+
+        execute_draw_circle(self, circle_sorter, self.circle_radius_result1, 1)
+        execute_draw_circle(self, circle_sorter, self.circle_radius_result2, 1.5)
+
+        execute_draw_circle(self, circle_sorter, self.circle_radius_result3, 2)
+        execute_draw_circle(self, circle_sorter, self.circle_radius_result4, 2.5)
+        execute_draw_circle(self, circle_sorter, self.circle_radius_result5, 3)
+
+        execute_sorter(self, circle_sorter, self.circle_pixels, self.circle_result)
+        for p in self.circle_pixels:
+            self.assertTrue(p in self.circle_result)
