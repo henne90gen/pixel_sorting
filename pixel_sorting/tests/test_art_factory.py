@@ -27,6 +27,8 @@ class ArtFactoryTest(TestCase):
                     os.makedirs(self.test_directory + file[:k])
             open(self.test_directory + file, 'w+').close()
 
-        self.assertListEqual(af.get_image_files(self.test_directory), self.expected_image_paths)
+        image_files = af.get_image_files(self.test_directory)
+        for image in self.expected_image_paths:
+            self.assertTrue(image in image_files)
 
         shutil.rmtree(self.test_directory)
