@@ -218,3 +218,7 @@ class SorterTests(unittest.TestCase):
         execute_sorter(self, circle_sorter, self.circle_pixels, self.circle_result)
         for p in self.circle_pixels:
             self.assertTrue(p in self.circle_result)
+		
+		# load large, non-square image and sort it
+		# check if all pixels from the original image are still in the pixels array
+
