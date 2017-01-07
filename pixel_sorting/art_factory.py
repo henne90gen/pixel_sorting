@@ -5,8 +5,10 @@ from PixelSorters import *
 from helper import *
 
 image_extensions = ["png", "jpg", ]
-sorters = [BasicSorter, Inverter, AlternatingRowSorter, AlternatingColumnSorter, DiamondSorter,
-           CircleSorter]
+sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
+           AlternatingRowSorter(alternation=100), AlternatingColumnSorter(), AlternatingColumnSorter(alternation=10),
+           AlternatingColumnSorter(alternation=100), DiamondSorter(),
+           CircleSorter()]
 
 
 def get_extension(path):
@@ -42,9 +44,8 @@ def apply_sorters_to_image(path_to_image):
     if not os.path.exists(image_folder):
         os.makedirs(image_folder)
 
-    for sorter_template in sorters:
+    for sorter in sorters:
         for criteria in SortCriteria.all_criteria:
-            sorter = sorter_template()
             sorter.img_width = img_width
             sorter.img_height = img_height
             sorter.sort_criteria = SortCriteria.all_criteria[criteria]

@@ -165,9 +165,9 @@ class DiamondSorter(PixelSorter):
 class CircleSorter(PixelSorter):
     def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False):
         super().__init__("CircleSorter", img_width, img_height, sort_criteria, reverse)
-        self.x = 0
-        self.y = 0
-        self.max_radius = 0
+        self.x = int(self.img_width / 2)
+        self.y = int(self.img_height / 2)
+        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
 
     def draw_pixel(self, pixels, temp_pixels, index, x, y):
         real_x = self.x + x

@@ -1,4 +1,6 @@
 from .test_helper import *
+from PixelSorters import *
+from PIL import Image
 
 test_image_path = "./pixel_sorting/tests/test_image_sorters_small.jpg"
 
