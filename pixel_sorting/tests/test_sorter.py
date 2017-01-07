@@ -1,10 +1,12 @@
 from .test_helper import *
 
+test_image_path = "./pixel_sorting/tests/test_image_sorters_small.jpg"
+
 
 class SorterTests(unittest.TestCase):
     def testPixelSorter(self):
-        sorter = PixelSorter()
-        sorter_img = Image.open("./pixel_sorting/tests/test_image.png")
+        sorter = PixelSorter("")
+        sorter_img = Image.open(test_image_path)
         sorter_pixels = []
         self.assertEqual(sorter.sort_image(sorter_img), None)
         self.assertEqual(sorter.sort_pixels(sorter_pixels), None)
@@ -218,7 +220,35 @@ class SorterTests(unittest.TestCase):
         execute_sorter(self, circle_sorter, self.circle_pixels, self.circle_result)
         for p in self.circle_pixels:
             self.assertTrue(p in self.circle_result)
-		
-		# load large, non-square image and sort it
-		# check if all pixels from the original image are still in the pixels array
 
+    def testCircleSorterWithRealFile(self):
+        img = Image.open(test_image_path)
+        img_width = img.size[0]
+        img_height = img.size[1]
+
+        pixels = get_pixels(img)
+
+        pixel_dict = {}
+        for p in pixels:
+            if p not in pixel_dict:
+                pixel_dict[p] = 0
+            pixel_dict[p] += 1
+
+        new_pixels = [p for p in pixels]
+
+        circle_sorter = CircleSorter(img_width, img_height, SortCriteria.built_in(), False)
+        circle_sorter.sort_pixels(new_pixels)
+
+        self.assertEqual(len(new_pixels), len(pixels), "The new image doesn't have the same number of pixels.")
+        for p in new_pixels:
+            self.assertTrue(p in pixels)
+
+        new_pixel_dict = {}
+        for p in pixels:
+            if p not in new_pixel_dict:
+                new_pixel_dict[p] = 0
+            new_pixel_dict[p] += 1
+
+        for p in new_pixel_dict:
+            self.assertTrue(p in pixel_dict)
+            self.assertEqual(new_pixel_dict[p], pixel_dict[p])

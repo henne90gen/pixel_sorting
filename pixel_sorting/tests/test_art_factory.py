@@ -32,3 +32,30 @@ class ArtFactoryTest(TestCase):
             self.assertTrue(image in image_files)
 
         shutil.rmtree(self.test_directory)
+
+    def testGetExtension(self):
+        self.assertEqual(af.get_extension("hello.jpg"), "jpg")
+
+    def testRemoveExtension(self):
+        self.assertEqual(af.remove_extension("hello.jpg"), "hello")
+        self.assertEqual(af.remove_extension("./hello.jpg"), "./hello")
+
+    expected_sorters = ["BasicSorter", "Inverter", "AlternatingRowSorter", "AlternatingColumnSorter", "DiamondSorter",
+                        "CircleSorter"]
+    expected_criteria = ["Average", "Blue", "Brightness", "BuiltIn", "Green", "Hue", "Lightness", "Red", "Saturation"]
+
+    def testApplySorterToImage(self):
+        af.apply_sorters_to_image("./pixel_sorting/tests/test_image.png")
+        image_folder = "./pixel_sorting/tests/test_image_folder/"
+
+        self.assertTrue(os.path.exists(image_folder))
+        num_files = len([name for name in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, name))])
+        self.assertEqual(num_files, (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1)
+        for sorter in self.expected_sorters:
+            for criteria in self.expected_criteria:
+                image_path = image_folder + sorter + criteria + ".png"
+                if sorter == "Inverter":
+                    image_path = image_folder + sorter + ".png"
+                self.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
+
+        shutil.rmtree(image_folder)
