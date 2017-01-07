@@ -2,7 +2,7 @@ import os
 import shutil
 from unittest import TestCase
 
-from pixel_sorting import art_factory as af
+from pixel_sorting.art_factory import *
 
 
 class ArtFactoryTest(TestCase):
@@ -11,7 +11,7 @@ class ArtFactoryTest(TestCase):
 
     def testIsImageFile(self):
         for test in self.image_tests:
-            self.assertEqual(af.is_image_file(test[0]), test[1])
+            self.assertEqual(is_image_file(test[0]), test[1])
 
     test_directory = "./pixel_sorting/tests/images/"
     test_images = ["hello.png", "What.Up", "test.jpg", "hey/here.png"]
@@ -27,25 +27,25 @@ class ArtFactoryTest(TestCase):
                     os.makedirs(self.test_directory + file[:k])
             open(self.test_directory + file, 'w+').close()
 
-        image_files = af.get_image_files(self.test_directory)
+        image_files = get_image_files(self.test_directory)
         for image in self.expected_image_paths:
             self.assertTrue(image in image_files)
 
         shutil.rmtree(self.test_directory)
 
     def testGetExtension(self):
-        self.assertEqual(af.get_extension("hello.jpg"), "jpg")
+        self.assertEqual(get_extension("hello.jpg"), "jpg")
 
     def testRemoveExtension(self):
-        self.assertEqual(af.remove_extension("hello.jpg"), "hello")
-        self.assertEqual(af.remove_extension("./hello.jpg"), "./hello")
+        self.assertEqual(remove_extension("hello.jpg"), "hello")
+        self.assertEqual(remove_extension("./hello.jpg"), "./hello")
 
     expected_sorters = ["BasicSorter", "Inverter", "AlternatingRowSorter", "AlternatingColumnSorter", "DiamondSorter",
                         "CircleSorter"]
     expected_criteria = ["Average", "Blue", "Brightness", "BuiltIn", "Green", "Hue", "Lightness", "Red", "Saturation"]
 
     def testApplySorterToImage(self):
-        af.apply_sorters_to_image("./pixel_sorting/tests/test_image.png")
+        apply_sorters_to_image("./pixel_sorting/tests/test_image.png")
         image_folder = "./pixel_sorting/tests/test_image_folder/"
 
         self.assertTrue(os.path.exists(image_folder))

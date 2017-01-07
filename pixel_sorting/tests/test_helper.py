@@ -3,7 +3,7 @@ import unittest
 
 from PIL import Image
 
-from helper import get_pixels, save_to_copy
+from pixel_sorting.helper import get_pixels, save_to_copy
 
 
 class HelperTest(unittest.TestCase):

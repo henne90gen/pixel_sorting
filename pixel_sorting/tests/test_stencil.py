@@ -1,6 +1,6 @@
 import unittest
 from PIL import Image
-from stencils import *
+from pixel_sorting.stencils import *
 
 test_image_path = "./pixel_sorting/tests/test_image.png"
 
