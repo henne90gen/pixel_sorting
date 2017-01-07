@@ -4,7 +4,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from PixelSorters import *
 from helper import *
 
-image_extensions = ["png", "jpg", ]
+image_extensions = ["png", "jpg", "jpeg", ]
 sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
            AlternatingRowSorter(alternation=100), AlternatingColumnSorter(), AlternatingColumnSorter(alternation=10),
            AlternatingColumnSorter(alternation=100), DiamondSorter(),
