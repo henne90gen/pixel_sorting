@@ -1,15 +1,19 @@
 import math
 
-import pixel_sorting.SortCriteria as SortCriteria
-from .helper import get_pixels
+import SortCriteria
+from helper import get_pixels
 
 
 class PixelSorter(object):
-    def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False):
+    def __init__(self, name, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False):
+        self.name = name
         self.img_width = img_width
         self.img_height = img_height
         self.sort_criteria = sort_criteria
         self.reverse = reverse
+
+    def to_string(self):
+        return self.name
 
     def sort_pixels(self, pixels):
         pass
@@ -19,8 +23,8 @@ class PixelSorter(object):
 
 
 class BasicSorter(PixelSorter):
-    def __init__(self, sort_criteria, reverse=False):
-        super().__init__(sort_criteria=sort_criteria, reverse=reverse)
+    def __init__(self, sort_criteria=SortCriteria.built_in(), reverse=False):
+        super().__init__("BasicSorter", sort_criteria=sort_criteria, reverse=reverse)
 
     def sort_pixels(self, pixels):
         pixels.sort(key=self.sort_criteria, reverse=self.reverse)
@@ -29,7 +33,7 @@ class BasicSorter(PixelSorter):
 
 class Inverter(PixelSorter):
     def __init__(self):
-        super().__init__()
+        super().__init__("Inverter")
 
     def sort_pixels(self, pixels):
         for i in range(len(pixels)):
@@ -42,7 +46,7 @@ class Inverter(PixelSorter):
 
 class RowSorter(PixelSorter):
     def __init__(self, img_width, img_height, sort_criteria, row, reverse=False):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
+        super().__init__("RowSorter", img_width, img_height, sort_criteria, reverse)
         self.row = row
 
     def sort_pixels(self, pixels):
@@ -60,8 +64,8 @@ class RowSorter(PixelSorter):
 
 
 class AlternatingRowSorter(PixelSorter):
-    def __init__(self, img_width, img_height, sort_criteria, reverse=False, alternation=1):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
+    def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False, alternation=1):
+        super().__init__("AlternatingRowSorter", img_width, img_height, sort_criteria, reverse)
         self.alternation = alternation
 
     def sort_pixels(self, pixels):
@@ -76,7 +80,7 @@ class AlternatingRowSorter(PixelSorter):
 
 class ColumnSorter(PixelSorter):
     def __init__(self, img_width, img_height, sort_criteria, column, reverse=False):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
+        super().__init__("ColumnSorter", img_width, img_height, sort_criteria, reverse)
         self.column = column
 
     def sort_pixels(self, pixels):
@@ -94,8 +98,8 @@ class ColumnSorter(PixelSorter):
 
 
 class AlternatingColumnSorter(PixelSorter):
-    def __init__(self, img_width, img_height, sort_criteria, reverse=False, alternation=1):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
+    def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False, alternation=1):
+        super().__init__("AlternatingColumnSorter", img_width, img_height, sort_criteria, reverse)
         self.alternation = alternation
 
     def sort_pixels(self, pixels):
@@ -109,10 +113,10 @@ class AlternatingColumnSorter(PixelSorter):
 
 
 class DiamondSorter(PixelSorter):
-    def __init__(self, img_width, img_height, sort_criteria, reverse=False):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
-        self.x = round(img_width / 2)
-        self.y = round(img_height / 2)
+    def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False):
+        super().__init__("DiamondSorter", img_width, img_height, sort_criteria, reverse)
+        self.x = 0
+        self.y = 0
 
     def next_position(self, pos):
         x = pos[0]
@@ -138,6 +142,9 @@ class DiamondSorter(PixelSorter):
         return pos
 
     def sort_pixels(self, pixels):
+        self.x = round(self.img_width / 2)
+        self.y = round(self.img_height / 2)
+
         pixels.sort(key=self.sort_criteria, reverse=self.reverse)
 
         temp_pixels = [p for p in pixels]
@@ -156,11 +163,11 @@ class DiamondSorter(PixelSorter):
 
 
 class CircleSorter(PixelSorter):
-    def __init__(self, img_width, img_height, sort_criteria, reverse=False):
-        super().__init__(img_width, img_height, sort_criteria, reverse)
-        self.x = int(img_width / 2)
-        self.y = int(img_height / 2)
-        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
+    def __init__(self, img_width=0, img_height=0, sort_criteria=SortCriteria.built_in(), reverse=False):
+        super().__init__("CircleSorter", img_width, img_height, sort_criteria, reverse)
+        self.x = 0
+        self.y = 0
+        self.max_radius = 0
 
     def draw_pixel(self, pixels, temp_pixels, index, x, y):
         real_x = self.x + x
@@ -211,10 +218,12 @@ class CircleSorter(PixelSorter):
         return index
 
     def sort_pixels(self, pixels):
+        self.x = int(self.img_width / 2)
+        self.y = int(self.img_height / 2)
+        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
         pixels.sort(key=self.sort_criteria, reverse=self.reverse)
         temp_pixels = [p for p in pixels]
 
-        # True if pixel is set already
         pixel_set = []
         x_offset = 0
         y_offset = 0
@@ -223,7 +232,7 @@ class CircleSorter(PixelSorter):
         if self.img_height % 2 != 0:
             y_offset = 1
         for i in range(self.y + y_offset):
-            temp = [False for j in range(self.x + x_offset)]
+            temp = [False for _ in range(self.x + x_offset)]
             pixel_set.append(temp)
 
         radius = 1
