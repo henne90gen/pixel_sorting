@@ -1,5 +1,6 @@
+import sort_criteria
 from .test_helper import *
-from PixelSorters import *
+from pixel_sorters import *
 from PIL import Image
 
 test_image_path = "./pixel_sorting/tests/test_image_sorters_small.jpg"
@@ -31,22 +32,22 @@ class SorterTests(unittest.TestCase):
     basic_avg_result = [(6, 3, 1), (15, 11, 2), (7, 24, 3), (12, 17, 5), (23, 10, 15), (16, 27, 18)]
 
     def testBasicSorter(self):
-        basic_sorter = BasicSorter(SortCriteria.built_in())
+        basic_sorter = BasicSorter(sort_criteria.built_in())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_builtin_result)
 
-        basic_sorter = BasicSorter(SortCriteria.red())
+        basic_sorter = BasicSorter(sort_criteria.red())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_red_result)
 
-        basic_sorter = BasicSorter(SortCriteria.green())
+        basic_sorter = BasicSorter(sort_criteria.green())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_green_result)
 
-        basic_sorter = BasicSorter(SortCriteria.blue())
+        basic_sorter = BasicSorter(sort_criteria.blue())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_blue_result)
 
-        basic_sorter = BasicSorter(SortCriteria.brightness())
+        basic_sorter = BasicSorter(sort_criteria.brightness())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_brightness_result)
 
-        basic_sorter = BasicSorter(SortCriteria.avg())
+        basic_sorter = BasicSorter(sort_criteria.avg())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_avg_result)
 
     row_pixels = [4, 2, 3, 5, 1,
@@ -57,17 +58,17 @@ class SorterTests(unittest.TestCase):
                    5, 4, 3, 2, 1]
 
     def testRowSorter(self):
-        row_sorter = RowSorter(5, 2, SortCriteria.built_in(), 0)
+        row_sorter = RowSorter(5, 2, sort_criteria.built_in(), 0)
         execute_sorter(self, row_sorter, self.row_pixels, self.row_result1)
 
-        row_sorter = RowSorter(5, 2, SortCriteria.built_in(), 1, True)
+        row_sorter = RowSorter(5, 2, sort_criteria.built_in(), 1, True)
         execute_sorter(self, row_sorter, self.row_pixels, self.row_result2)
 
     alt_pixels = [p for p in range(1, 26)]
     alt_row_result = [1, 2, 3, 4, 5, 10, 9, 8, 7, 6, 11, 12, 13, 14, 15, 20, 19, 18, 17, 16, 21, 22, 23, 24, 25]
 
     def testAlternatingRowSorter(self):
-        row_sorter = AlternatingRowSorter(5, 5, SortCriteria.built_in(), 1)
+        row_sorter = AlternatingRowSorter(5, 5, sort_criteria.built_in(), 1)
         execute_sorter(self, row_sorter, self.alt_pixels, self.alt_row_result)
 
     col_pixels = [4, 7, 3, 9, 1, 6, 5, 8, 2, 10]
@@ -75,7 +76,7 @@ class SorterTests(unittest.TestCase):
     col_result2 = [4, 10, 3, 9, 1, 8, 5, 7, 2, 6]
 
     def testColumnSorter(self):
-        col_sorter = ColumnSorter(2, 5, SortCriteria.built_in(), 0, False)
+        col_sorter = ColumnSorter(2, 5, sort_criteria.built_in(), 0, False)
         execute_sorter(self, col_sorter, self.col_pixels, self.col_result1)
 
         col_sorter.column = 1
@@ -85,7 +86,7 @@ class SorterTests(unittest.TestCase):
     alt_col_result = [1, 22, 3, 24, 5, 6, 17, 8, 19, 10, 11, 12, 13, 14, 15, 16, 7, 18, 9, 20, 21, 2, 23, 4, 25]
 
     def testAlternatingColumnSorter(self):
-        col_sorter = AlternatingColumnSorter(5, 5, SortCriteria.built_in(), 1)
+        col_sorter = AlternatingColumnSorter(5, 5, sort_criteria.built_in(), 1)
         execute_sorter(self, col_sorter, self.alt_pixels, self.alt_col_result)
 
     diamond_pixels = [p for p in range(1, 26)]
@@ -96,7 +97,7 @@ class SorterTests(unittest.TestCase):
                       23, 16, 8, 15, 22]
 
     def testDiamondSorter(self):
-        diamond_sorter = DiamondSorter(5, 5, SortCriteria.built_in(), False)
+        diamond_sorter = DiamondSorter(5, 5, sort_criteria.built_in(), False)
 
         self.assertEqual(diamond_sorter.next_position((0, 0)), (1, 0))
         self.assertEqual(diamond_sorter.next_position((1, 0)), (0, 1))
@@ -199,7 +200,7 @@ class SorterTests(unittest.TestCase):
                      23, 20, 12, 18, 22]
 
     def testCircleSorter(self):
-        circle_sorter = CircleSorter(5, 5, SortCriteria.built_in())
+        circle_sorter = CircleSorter(5, 5, sort_criteria.built_in())
 
         execute_draw_pixel(self, circle_sorter, 1, 0, 0, self.circle_pixel_result, 1)
         execute_draw_pixel(self, circle_sorter, 3, 0, 0, self.circle_pixels, 0)
@@ -238,7 +239,7 @@ class SorterTests(unittest.TestCase):
 
         new_pixels = [p for p in pixels]
 
-        circle_sorter = CircleSorter(img_width, img_height, SortCriteria.built_in(), False)
+        circle_sorter = CircleSorter(img_width, img_height, sort_criteria.built_in(), False)
         circle_sorter.sort_pixels(new_pixels)
 
         self.assertEqual(len(new_pixels), len(pixels), "The new image doesn't have the same number of pixels.")

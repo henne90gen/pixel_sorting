@@ -1,5 +1,9 @@
+import os
 import unittest
-from pixel_sorting import *
+
+from PIL import Image
+
+from helper import get_pixels, save_to_copy
 
 
 class HelperTest(unittest.TestCase):

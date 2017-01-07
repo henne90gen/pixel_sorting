@@ -1,7 +1,8 @@
 import os
 from multiprocessing.dummy import Pool as ThreadPool
 
-from PixelSorters import *
+import sort_criteria
+from pixel_sorters import *
 from helper import *
 
 image_extensions = ["png", "jpg", "jpeg", ]
@@ -45,10 +46,10 @@ def apply_sorters_to_image(path_to_image):
         os.makedirs(image_folder)
 
     for sorter in sorters:
-        for criteria in SortCriteria.all_criteria:
+        for criteria in sort_criteria.all_criteria:
             sorter.img_width = img_width
             sorter.img_height = img_height
-            sorter.sort_criteria = SortCriteria.all_criteria[criteria]
+            sorter.sort_criteria = sort_criteria.all_criteria[criteria]
 
             temp_pixels = [p for p in img_pixels]
             sorter.sort_pixels(temp_pixels)
