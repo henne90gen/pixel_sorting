@@ -1,9 +1,9 @@
 import os
 from multiprocessing.dummy import Pool as ThreadPool
 
-import sort_criteria
-from pixel_sorters import *
-from helper import *
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.pixel_sorters import *
+from pixel_sorting.helper import *
 
 image_extensions = ["png", "jpg", "jpeg", ]
 sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
