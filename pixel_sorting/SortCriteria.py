@@ -1,3 +1,4 @@
+
 def built_in():
     return lambda pixel: pixel
 
@@ -37,3 +38,7 @@ def saturation():
 
 def lightness():
     return lambda pixel: (max(pixel) / 255 + min(pixel) / 255) / 2
+
+
+all_criteria = {"BuiltIn": built_in(), "Red": red(), "Green": green(), "Blue": blue(), "Brightness": brightness(),
+                "Average": avg(), "Hue": hue(), "Saturation": saturation(), "Lightness": lightness()}
