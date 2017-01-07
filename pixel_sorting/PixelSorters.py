@@ -1,6 +1,6 @@
 import math
 
-import SortCriteria
+import pixel_sorting.SortCriteria as SortCriteria
 from helper import get_pixels
 
 
