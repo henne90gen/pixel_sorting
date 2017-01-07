@@ -9,10 +9,10 @@ def pixels_to_linear_array(pixels, width, height):
     return result
 
 
-def get_pixels(img):
-    pixels = img.load()
-    width = img.size[0]
-    height = img.size[1]
+def get_pixels(image):
+    pixels = image.load()
+    width = image.size[0]
+    height = image.size[1]
     return pixels_to_linear_array(pixels, width, height)
 
 

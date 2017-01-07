@@ -1,6 +1,6 @@
 import math
 
-from . import get_pixels
+from helper import get_pixels
 
 
 class Stencil(object):
