@@ -29,6 +29,9 @@ class SorterTests(unittest.TestCase):
     basic_blue_result = [(6, 3, 1), (15, 11, 2), (7, 24, 3), (12, 17, 5), (23, 10, 15), (16, 27, 18)]
     basic_brightness_result = [(6, 3, 1), (15, 11, 2), (12, 17, 5), (23, 10, 15), (7, 24, 3), (16, 27, 18)]
     basic_avg_result = [(6, 3, 1), (15, 11, 2), (7, 24, 3), (12, 17, 5), (23, 10, 15), (16, 27, 18)]
+    basic_hue = [(6, 3, 1), (15, 11, 2), (12, 17, 5), (7, 24, 3), (16, 27, 18), (23, 10, 15)]
+    basic_saturation = [(16, 27, 18), (23, 10, 15), (12, 17, 5), (6, 3, 1), (15, 11, 2), (7, 24, 3)]
+    basic_lightness = [(6, 3, 1), (15, 11, 2), (12, 17, 5), (7, 24, 3), (23, 10, 15), (16, 27, 18)]
 
     def testBasicSorter(self):
         basic_sorter = BasicSorter(sort_criteria.built_in())
@@ -48,6 +51,15 @@ class SorterTests(unittest.TestCase):
 
         basic_sorter = BasicSorter(sort_criteria.avg())
         execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_avg_result)
+
+        basic_sorter = BasicSorter(sort_criteria.hue())
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_hue)
+
+        basic_sorter = BasicSorter(sort_criteria.saturation())
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_saturation)
+
+        basic_sorter = BasicSorter(sort_criteria.lightness())
+        execute_sorter(self, basic_sorter, self.basic_pixels, self.basic_lightness)
 
     row_pixels = [4, 2, 3, 5, 1,
                   3, 1, 5, 2, 4]
