@@ -85,7 +85,7 @@ def apply_sorters_to_dir(path_to_dir):
     pool = ThreadPool(12)
 
     pool.map(apply_sorters_to_image, image_files)
-    pool.close()
     pool.join()
+    pool.close()
 
     print("Done generating.")

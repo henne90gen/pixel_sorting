@@ -15,6 +15,7 @@ class HelperTest(unittest.TestCase):
         save_to_copy(img, pixels, path + "copy_" + filename)
         self.assertTrue(os.path.exists(path + filename), "Original file doesn't exist any more.")
         self.assertTrue(os.path.exists(path + "copy_" + filename), "No copy was created.")
+        os.remove(path + "copy_" + filename)
 
 
 def execute_sorter(tester, sorter, input_pixels, expected_result):
