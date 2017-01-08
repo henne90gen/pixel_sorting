@@ -40,7 +40,7 @@ class RectangleStencil(Stencil):
         if self.x + local_width > self.img_width:
             local_width = self.img_width - self.x
         if self.y >= self.img_height or self.x >= self.img_width:
-            raise Exception("Position out of bounds")
+            raise Exception("Position out of bounds: (" + str(self.x) + "|" + str(self.y) + ")")
 
         for row in range(self.y, self.y + local_height):
             for col in range(self.x, self.x + local_width):

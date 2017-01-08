@@ -19,7 +19,10 @@ def get_pixels(image):
 def save_to_copy(img, pixels, filename):
     width = img.size[0]
     height = img.size[1]
-    new_image = Image.new(img.mode, (width, height))
+    save_to_img(width, height, img.mode, pixels, filename)
+
+
+def save_to_img(width, height, mode, pixels, filename):
+    new_image = Image.new(mode, (width, height))
     new_image.putdata(pixels)
     new_image.save(filename)
-

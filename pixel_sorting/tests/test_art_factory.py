@@ -1,5 +1,6 @@
 import os
 import shutil
+from time import sleep
 from unittest import TestCase
 
 from pixel_sorting.art_factory import *
@@ -40,11 +41,12 @@ class ArtFactoryTest(TestCase):
         self.assertEqual(remove_extension("hello.jpg"), "hello")
         self.assertEqual(remove_extension("./hello.jpg"), "./hello")
 
-    expected_sorters = ["BasicSorter", "Inverter", "AlternatingRowSorter", "AlternatingColumnSorter", "DiamondSorter",
-                        "CircleSorter"]
+    expected_sorters = ["BasicSorter", "Inverter", "AlternatingRowSorter1", "AlternatingRowSorter10",
+                        "AlternatingRowSorter100", "AlternatingColumnSorter1", "AlternatingColumnSorter10",
+                        "AlternatingColumnSorter100", "DiamondSorter", "CircleSorter"]
     expected_criteria = ["Average", "Blue", "Brightness", "BuiltIn", "Green", "Hue", "Lightness", "Red", "Saturation"]
 
-    def testApplySorterToImage(self):
+    def testApplySortersToImage(self):
         apply_sorters_to_image("./pixel_sorting/tests/test_image.png")
         image_folder = "./pixel_sorting/tests/test_image_folder/"
 
@@ -59,3 +61,35 @@ class ArtFactoryTest(TestCase):
                 self.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
 
         shutil.rmtree(image_folder)
+
+    def testApplySortersToDir(self):
+        test_directory = "./pixel_sorting/tests/"
+        apply_sorters_to_dir(test_directory)
+        try:
+            test_dir_1 = test_directory + "test_image_folder/"
+            self.assertTrue(os.path.exists(test_dir_1))
+            num_files = len([name for name in os.listdir(test_dir_1) if
+                             os.path.isfile(os.path.join(test_dir_1, name))])
+            self.assertEqual(num_files, (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1)
+            for sorter in self.expected_sorters:
+                for criteria in self.expected_criteria:
+                    image_path = test_dir_1 + sorter + criteria + ".png"
+                    if sorter == "Inverter":
+                        image_path = test_dir_1 + sorter + ".png"
+                    self.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
+
+            test_dir_2 = test_directory + "test_image_sorters_folder/"
+            self.assertTrue(os.path.exists("./pixel_sorting/tests/test_image_sorters_folder"))
+            num_files = len([name for name in os.listdir(test_dir_2) if
+                             os.path.isfile(os.path.join(test_dir_2, name))])
+            self.assertEqual(num_files, (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1)
+            for sorter in self.expected_sorters:
+                for criteria in self.expected_criteria:
+                    image_path = test_dir_2 + sorter + criteria + ".jpg"
+                    if sorter == "Inverter":
+                        image_path = test_dir_2 + sorter + ".jpg"
+                    self.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
+
+        finally:
+            shutil.rmtree("./pixel_sorting/tests/test_image_folder")
+            shutil.rmtree("./pixel_sorting/tests/test_image_sorters_folder")

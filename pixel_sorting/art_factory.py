@@ -45,8 +45,9 @@ def apply_sorters_to_image(path_to_image):
     if not os.path.exists(image_folder):
         os.makedirs(image_folder)
 
-    for sorter in sorters:
+    for sorter_template in sorters:
         for criteria in sort_criteria.all_criteria:
+            sorter = sorter_template.copy()
             sorter.img_width = img_width
             sorter.img_height = img_height
             sorter.sort_criteria = sort_criteria.all_criteria[criteria]
@@ -60,6 +61,7 @@ def apply_sorters_to_image(path_to_image):
 
             if isinstance(sorter, Inverter):
                 break
+    image.close()
 
 
 def is_image_file(filename):
@@ -85,7 +87,7 @@ def apply_sorters_to_dir(path_to_dir):
     pool = ThreadPool(12)
 
     pool.map(apply_sorters_to_image, image_files)
-    pool.join()
     pool.close()
+    pool.join()
 
     print("Done generating.")
