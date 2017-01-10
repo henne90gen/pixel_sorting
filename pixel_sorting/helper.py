@@ -1,4 +1,7 @@
 from PIL import Image
+import os
+
+image_extensions = ["png", "jpg", "jpeg", ]
 
 
 def pixels_to_linear_array(pixels, width, height):
@@ -26,3 +29,42 @@ def save_to_img(width, height, mode, pixels, filename):
     new_image = Image.new(mode, (width, height))
     new_image.putdata(pixels)
     new_image.save(filename)
+
+
+def is_image_file(filename):
+    parts = filename.split('.')
+    for part in parts:
+        if part.lower() in image_extensions:
+            return True
+    return False
+
+
+def is_generated_image(path):
+    parts = path.split("/")
+    if "generated" in parts[len(parts) - 2]:
+        return True
+    return False
+
+
+def get_extension(path):
+    parts = path.split(".")
+    return parts[-1]
+
+
+def remove_extension(path):
+    parts = path.split(".")
+    new_path = ""
+    for i in range(len(parts) - 1):
+        new_path = new_path + parts[i]
+    if path[0] == '.':
+        new_path = "." + new_path
+    return new_path
+
+
+def get_image_files(path_to_dir):
+    image_files = []
+    for dir_name, sub_dir_names, file_names in os.walk(path_to_dir):
+        for filename in file_names:
+            if is_image_file(filename) and not is_generated_image(os.path.join(dir_name, filename)):
+                image_files.append(os.path.join(dir_name, filename))
+    return image_files

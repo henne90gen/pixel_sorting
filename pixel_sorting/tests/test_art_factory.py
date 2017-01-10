@@ -65,13 +65,15 @@ class ArtFactoryTest(TestCase):
 
     def testApplySortersToDir(self):
         test_directory = "./pixel_sorting/tests/"
-        apply_all_sorters_to_dir(test_directory)
+        num_expected_files_per_image = (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1
+
+        self.assertEqual(apply_all_sorters_to_dir(test_directory), num_expected_files_per_image * 2)
+
         try:
             test_dir_1 = test_directory + "test_image_generated/"
             self.assertTrue(os.path.exists(test_dir_1))
-            num_files = len([name for name in os.listdir(test_dir_1) if
-                             os.path.isfile(os.path.join(test_dir_1, name))])
-            self.assertEqual(num_files, (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1)
+            num_files = len([name for name in os.listdir(test_dir_1) if os.path.isfile(os.path.join(test_dir_1, name))])
+            self.assertEqual(num_files, num_expected_files_per_image)
             for sorter in self.expected_sorters:
                 for criteria in self.expected_criteria:
                     image_path = test_dir_1 + sorter + criteria + ".png"
@@ -80,10 +82,10 @@ class ArtFactoryTest(TestCase):
                     self.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
 
             test_dir_2 = test_directory + "test_image_sorters_generated/"
-            self.assertTrue(os.path.exists("./pixel_sorting/tests/test_image_sorters_generated"))
+            self.assertTrue(os.path.exists(test_dir_2))
             num_files = len([name for name in os.listdir(test_dir_2) if
                              os.path.isfile(os.path.join(test_dir_2, name))])
-            self.assertEqual(num_files, (len(self.expected_sorters) - 1) * len(self.expected_criteria) + 1)
+            self.assertEqual(num_files, num_expected_files_per_image)
             for sorter in self.expected_sorters:
                 for criteria in self.expected_criteria:
                     image_path = test_dir_2 + sorter + criteria + ".jpg"

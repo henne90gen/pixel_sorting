@@ -7,36 +7,34 @@ import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.pixel_sorters import *
 from pixel_sorting.helper import *
 
-image_extensions = ["png", "jpg", "jpeg", ]
-sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
-           AlternatingRowSorter(alternation=100), AlternatingColumnSorter(), AlternatingColumnSorter(alternation=10),
-           AlternatingColumnSorter(alternation=100), DiamondSorter(), CircleSorter(), CheckerBoardSorter()]
+all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
+               AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
+               AlternatingColumnSorter(alternation=10),
+               AlternatingColumnSorter(alternation=100), DiamondSorter(), CircleSorter(), CheckerBoardSorter()]
 
 
-def get_extension(path):
-    parts = path.split(".")
-    return parts[-1]
-
-
-def remove_extension(path):
-    parts = path.split(".")
-    new_path = ""
-    for i in range(len(parts) - 1):
-        new_path = new_path + parts[i]
-    if path[0] == '.':
-        new_path = "." + new_path
-    return new_path
-
-
-def generate_image_path(image_folder, sorter, criteria, extension):
+def get_generated_image_path(image_folder, sorter, criteria, extension):
     if isinstance(sorter, Inverter):
         return image_folder + sorter.to_string() + "." + extension
     return image_folder + sorter.to_string() + criteria + "." + extension
 
 
 def apply_all_sorters_to_image(path_to_image):
-    print(path_to_image)
+    return apply_sorters_to_image([all_sorters, path_to_image])
+
+
+def apply_sorters_to_image(argument):
+    """
+    :param argument:
+    0: array of sorter templates
+    1: path to image
+    """
+    sorters = argument[0]
+    path_to_image = argument[1]
+    print("Started generating for " + path_to_image)
+
     image = Image.open(path_to_image)
+    img_mode = image.mode
     img_width = image.size[0]
     img_height = image.size[1]
     img_pixels = get_pixels(image)
@@ -52,68 +50,67 @@ def apply_all_sorters_to_image(path_to_image):
 
     for sorter_template in sorters:
         for criteria in sort_criteria.all_criteria:
-            image_path = generate_image_path(image_folder, sorter_template, criteria, extension)
+            image_path = get_generated_image_path(image_folder, sorter_template, criteria, extension)
 
-            arguments.append([image, image_path, sorter_template, criteria, img_width, img_height, img_pixels])
+            arguments.append([image_path, sorter_template, criteria, img_width, img_height, img_mode, img_pixels])
             if isinstance(sorter_template, Inverter):
                 break
 
-    thread_pool.map(apply_sorter_to_image, arguments)
+    result_list = thread_pool.map(apply_sorter_to_image, arguments)
     image.close()
     thread_pool.close()
     thread_pool.join()
 
+    num_generated = 0
+    for result in result_list:
+        if result:
+            num_generated += 1
+    return num_generated
+
 
 def apply_sorter_to_image(argument):
-    sorter = argument[2].copy()
-    sorter.img_width = argument[4]
-    sorter.img_height = argument[5]
-    sorter.criteria = sort_criteria.all_criteria[argument[3]]
-    if os.path.isfile(argument[1]):
-        return
+    """
+    Uses a tuple of arguments, because thread_pool.map can only pass one argument
+    :param argument:
+    0: path to new image\n
+    1: sorter template\n
+    2: sort criteria\n
+    3: width of image\n
+    4: height of image\n
+    5: mode of image\n
+    6: pixels of image\n
+    """
+    sorter = argument[1].copy()
+    sorter.img_width = argument[3]
+    sorter.img_height = argument[4]
+    sorter.criteria = sort_criteria.all_criteria[argument[2]]
+    if os.path.isfile(argument[0]):
+        return False
     temp_pixels = [p for p in argument[6]]
     sorter.sort_pixels(temp_pixels)
-    save_to_copy(argument[0], temp_pixels, argument[1])
-    print("Generated", argument[1])
-
-
-def is_image_file(filename):
-    parts = filename.split('.')
-    for part in parts:
-        if part.lower() in image_extensions:
-            return True
-    return False
-
-
-def is_generated_image(path):
-    parts = path.split("/")
-    if "generated" in parts[len(parts) - 2]:
-        return True
-    return False
-
-
-def get_image_files(path_to_dir):
-    image_files = []
-    for dir_name, sub_dir_names, file_names in os.walk(path_to_dir):
-        for filename in file_names:
-            if is_image_file(filename) and not is_generated_image(os.path.join(dir_name, filename)):
-                image_files.append(os.path.join(dir_name, filename))
-    return image_files
+    save_to_img(argument[3], argument[4], argument[5], temp_pixels, argument[0])
+    print("Generated", argument[0])
+    return True
 
 
 def apply_all_sorters_to_dir(path_to_dir):
     image_files = get_image_files(path_to_dir)
     print("Generating sorted images for:")
+    for image in image_files:
+        print(image)
 
     start_time = time.time()
 
     thread_pool = ThreadPool(processes=2)
-    thread_pool.map(apply_all_sorters_to_image, image_files)
+    num_generated_list = thread_pool.map(apply_all_sorters_to_image, image_files)
     thread_pool.close()
     thread_pool.join()
 
     stop_time = time.time()
-
     time_diff = stop_time - start_time
 
-    print("Done generating in " + str(time_diff))
+    total_generated = sum(num_generated_list)
+    print()
+    print("Done. Generated " + str(total_generated) + " sorted images in " + str(time_diff))
+    print()
+    return total_generated
