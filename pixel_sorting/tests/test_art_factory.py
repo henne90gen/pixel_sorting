@@ -77,3 +77,21 @@ class ArtFactoryTest(TestCase):
     def testIsGeneratedImage(self):
         self.assertTrue(is_generated_image("/generated_some_folder/some_image.jpg"))
         self.assertFalse(is_generated_image("./res/city_folder/city.png"))
+
+    def testApplySorterToImage(self):
+        image = Image.open("./pixel_sorting/tests/test_image.png")
+        sorter_template = BasicSorter()
+        criteria = "BuiltIn"
+        extension = ".png"
+        test_directory = "./pixel_sorting/tests/test_image_generated/"
+        path_to_image = get_generated_image_path(test_directory, sorter_template,
+                                                 criteria, extension)
+        argument = [path_to_image, sorter_template, criteria, image.size[0], image.size[1], image.mode,
+                    get_pixels(image)]
+        os.mkdir(test_directory)
+
+        try:
+            self.assertEqual(apply_sorter_to_image(argument), True)
+            self.assertEqual(apply_sorter_to_image(argument), False)
+        finally:
+            shutil.rmtree(test_directory)
