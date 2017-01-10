@@ -4,7 +4,7 @@ from time import sleep
 from unittest import TestCase
 
 from pixel_sorting.art_factory import *
-from tests.test_helper import assert_generated_directory, get_expected_files_per_image
+from .test_helper import assert_generated_directory, get_expected_files_per_image
 
 
 class ArtFactoryTest(TestCase):
