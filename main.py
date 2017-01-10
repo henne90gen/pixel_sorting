@@ -3,6 +3,7 @@ from PIL import Image
 from pixel_sorting.art_factory import apply_all_sorters_to_dir
 from pixel_sorting.helper import get_pixels, save_to_copy
 from pixel_sorting.pixel_sorters import CircleSorter
+from pixel_sorting.sort_criteria import *
 
 
 def main():

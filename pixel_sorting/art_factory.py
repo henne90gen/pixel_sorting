@@ -46,31 +46,35 @@ def apply_all_sorters_to_image(path_to_image):
     if not os.path.exists(image_folder):
         os.makedirs(image_folder)
 
-    thread_pool = ThreadPool(processes=10)
+    thread_pool = ThreadPool(processes=12)
+
+    arguments = []
 
     for sorter_template in sorters:
         for criteria in sort_criteria.all_criteria:
             image_path = generate_image_path(image_folder, sorter_template, criteria, extension)
-            thread_pool.apply_async(apply_sorter_to_image,
-                                    (image, image_path, sorter_template, criteria, img_width, img_height, img_pixels))
+
+            arguments.append([image, image_path, sorter_template, criteria, img_width, img_height, img_pixels])
             if isinstance(sorter_template, Inverter):
                 break
+
+    thread_pool.map(apply_sorter_to_image, arguments)
     image.close()
     thread_pool.close()
     thread_pool.join()
 
 
-def apply_sorter_to_image(image, image_path, sorter_template, criteria, img_width, img_height, img_pixels):
-    sorter = sorter_template.copy()
-    sorter.img_width = img_width
-    sorter.img_height = img_height
-    sorter.criteria = sort_criteria.all_criteria[criteria]
-    if os.path.isfile(image_path):
+def apply_sorter_to_image(argument):
+    sorter = argument[2].copy()
+    sorter.img_width = argument[4]
+    sorter.img_height = argument[5]
+    sorter.criteria = sort_criteria.all_criteria[argument[3]]
+    if os.path.isfile(argument[1]):
         return
-    temp_pixels = [p for p in img_pixels]
+    temp_pixels = [p for p in argument[6]]
     sorter.sort_pixels(temp_pixels)
-    save_to_copy(image, temp_pixels, image_path)
-    print("Generated", image_path)
+    save_to_copy(argument[0], temp_pixels, argument[1])
+    print("Generated", argument[1])
 
 
 def is_image_file(filename):
@@ -103,7 +107,7 @@ def apply_all_sorters_to_dir(path_to_dir):
 
     start_time = time.time()
 
-    thread_pool = ThreadPool(processes=len(image_files))
+    thread_pool = ThreadPool(processes=2)
     thread_pool.map(apply_all_sorters_to_image, image_files)
     thread_pool.close()
     thread_pool.join()
