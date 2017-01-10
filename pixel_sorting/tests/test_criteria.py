@@ -263,3 +263,11 @@ class CriteriaTest(TestCase):
                     hsl_pixel = (hue()(pixel), saturation()(pixel), lightness()(pixel))
                     self.assertEqual(hsl_pixel, self.hsl_result[index])
                     index += 1
+
+    def testThreshold(self):
+        pixel = (240, 230, 10)
+        self.assertEqual(green()(pixel), 230)
+        self.assertEqual(threshold(green(), 229)(pixel), 230)
+        self.assertEqual(threshold(green(), 230)(pixel), 0)
+        self.assertEqual(threshold(blue(), 200)(pixel), 0)
+        self.assertEqual(threshold(blue(), 5)(pixel), 10)

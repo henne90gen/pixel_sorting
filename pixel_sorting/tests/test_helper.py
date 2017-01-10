@@ -51,3 +51,22 @@ def execute_draw_pixel(tester, circle_sorter, x, y, index, expected_result, expe
     test_pixels = [p for p in tester.circle_pixels]
     tester.assertEqual(circle_sorter.draw_pixel(test_pixels, tester.pixel_source, index, x, y), expected_return)
     tester.assertEqual(test_pixels, expected_result)
+
+
+def get_expected_files_per_image(tester):
+    return (len(tester.expected_sorters) - 1) * len(tester.expected_criteria) + 1
+
+
+def assert_generated_directory(tester, directory, extension):
+    num_expected_files_per_image = get_expected_files_per_image(tester)
+
+    tester.assertTrue(os.path.exists(directory))
+    num_files = len(
+        [name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
+    tester.assertEqual(num_files, num_expected_files_per_image)
+    for sorter in tester.expected_sorters:
+        for criteria in tester.expected_criteria:
+            image_path = directory + sorter + criteria + extension
+            if sorter == "Inverter":
+                image_path = directory + sorter + extension
+            tester.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")

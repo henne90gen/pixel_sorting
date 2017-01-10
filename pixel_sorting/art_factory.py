@@ -9,8 +9,8 @@ from pixel_sorting.helper import *
 
 all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
                AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
-               AlternatingColumnSorter(alternation=10),
-               AlternatingColumnSorter(alternation=100), DiamondSorter(), CircleSorter(), CheckerBoardSorter()]
+               AlternatingColumnSorter(alternation=10), AlternatingColumnSorter(alternation=100), DiamondSorter(),
+               CircleSorter(), CheckerBoardSorter()]
 
 
 def get_generated_image_path(image_folder, sorter, criteria, extension):
