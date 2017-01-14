@@ -286,3 +286,7 @@ class SorterTests(unittest.TestCase):
     def testCheckerBoardSorter(self):
         board_sorter = CheckerBoardSorter(16, 16)
         execute_sorter(self, board_sorter, self.board_square, self.board_square_result)
+
+    def testExtendedCheckerBoardSorter(self):
+        board_sorter = ExtendedCheckerBoardSorter(16, 16)
+        execute_sorter(self, board_sorter, self.board_square, self.board_square_result)
