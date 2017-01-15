@@ -3,7 +3,8 @@ import unittest
 
 from PIL import Image
 
-from pixel_sorting.helper import get_pixels, save_to_copy
+from pixel_sorting.pixel_sorters import BasicSorter, CircleSorter
+from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
 
 
 class HelperTest(unittest.TestCase):
@@ -16,6 +17,17 @@ class HelperTest(unittest.TestCase):
         self.assertTrue(os.path.exists(path + filename), "Original file doesn't exist any more.")
         self.assertTrue(os.path.exists(path + "copy_" + filename), "No copy was created.")
         os.remove(path + "copy_" + filename)
+
+    def testGetExtension(self):
+        self.assertEqual(get_extension("hello.jpg"), "jpg")
+
+    def testRemoveExtension(self):
+        self.assertEqual("hello", remove_extension("hello.jpg"))
+        self.assertEqual("./hello", remove_extension("./hello.jpg"))
+
+    def testGetSorterName(self):
+        self.assertEqual("BasicSorter", get_sorter_name(BasicSorter))
+        self.assertEqual("CircleSorter", get_sorter_name(CircleSorter))
 
 
 def execute_sorter(tester, sorter, input_pixels, expected_result):

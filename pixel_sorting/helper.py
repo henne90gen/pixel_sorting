@@ -68,3 +68,10 @@ def get_image_files(path_to_dir):
             if is_image_file(filename) and not is_generated_image(os.path.join(dir_name, filename)):
                 image_files.append(os.path.join(dir_name, filename))
     return image_files
+
+
+def get_sorter_name(sorter):
+    result = str(sorter)
+    result = result[36:]
+    result = result[:-2]
+    return result

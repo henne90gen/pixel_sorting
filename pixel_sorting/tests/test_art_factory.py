@@ -35,16 +35,13 @@ class ArtFactoryTest(TestCase):
 
         shutil.rmtree(self.test_directory)
 
-    def testGetExtension(self):
-        self.assertEqual(get_extension("hello.jpg"), "jpg")
+    expected_sorters = ['BasicSorter', 'Inverter', 'AlternatingRowSorter1', 'AlternatingRowSorter10',
+                        'AlternatingRowSorter100', 'AlternatingColumnSorter1', 'AlternatingColumnSorter10',
+                        'AlternatingColumnSorter100', 'DiamondSorter', 'CircleSorter', 'CheckerBoardSorterBasicSorter',
+                        'CheckerBoardSorterAlternatingRowSorter', 'CheckerBoardSorterAlternatingColumnSorter',
+                        'CheckerBoardSorterDiamondSorter', 'CheckerBoardSorterCircleSorter',
+                        'CheckerBoardSorterCheckerBoardSorter']
 
-    def testRemoveExtension(self):
-        self.assertEqual(remove_extension("hello.jpg"), "hello")
-        self.assertEqual(remove_extension("./hello.jpg"), "./hello")
-
-    expected_sorters = ["BasicSorter", "Inverter", "AlternatingRowSorter1", "AlternatingRowSorter10",
-                        "AlternatingRowSorter100", "AlternatingColumnSorter1", "AlternatingColumnSorter10",
-                        "AlternatingColumnSorter100", "DiamondSorter", "CircleSorter", "CheckerBoardSorter"]
     expected_criteria = ["Average", "Blue", "Brightness", "BuiltIn", "Green", "Hue", "Lightness", "Red", "Saturation",
                          "HalfThresholdAverage", "HalfThresholdBlue", "HalfThresholdBrightness", "HalfThresholdBuiltIn",
                          "HalfThresholdGreen", "HalfThresholdHue", "HalfThresholdLightness", "HalfThresholdRed",
@@ -63,7 +60,7 @@ class ArtFactoryTest(TestCase):
         test_directory = "./pixel_sorting/tests/"
 
         try:
-            self.assertEqual(apply_all_sorters_to_dir(test_directory), get_expected_files_per_image(self) * 2)
+            apply_all_sorters_to_dir(test_directory)
 
             test_dir_1 = test_directory + "test_image_generated/"
             assert_generated_directory(self, test_dir_1, ".png")

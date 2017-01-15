@@ -51,8 +51,9 @@ class RectangleStencil(Stencil):
         index = 0
         for row in range(self.y, self.y + self.height):
             for col in range(self.x, self.x + self.width):
-                pixels[row * self.img_width + col] = rect_pixels[index]
-                index += 1
+                if index < len(rect_pixels):
+                    pixels[row * self.img_width + col] = rect_pixels[index]
+                    index += 1
         return pixels
 
 

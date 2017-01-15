@@ -1,7 +1,7 @@
 import math
 
 import pixel_sorting.sort_criteria as sort_criteria
-from pixel_sorting.helper import get_pixels
+from pixel_sorting.helper import get_pixels, get_sorter_name
 from pixel_sorting.stencils import RectangleStencil
 
 
@@ -276,7 +276,7 @@ class CircleSorter(PixelSorter):
 class CheckerBoardSorter(PixelSorter):
     def __init__(self, img_width=0, img_height=0, criteria=sort_criteria.built_in(), reverse=False,
                  sorter=BasicSorter, width=8, height=8):
-        super().__init__("CheckerBoardSorter", img_width, img_height, criteria, reverse)
+        super().__init__("CheckerBoardSorter" + get_sorter_name(sorter), img_width, img_height, criteria, reverse)
         self.width = width
         self.height = height
         self.sorter = sorter
@@ -292,6 +292,8 @@ class CheckerBoardSorter(PixelSorter):
                 rect_height = round(self.img_height / self.height)
                 real_x = round(x * rect_width)
                 real_y = round(y * rect_height)
+                if real_x >= self.img_width or real_y >= self.img_height:
+                    continue
                 rect = RectangleStencil(self.img_width, self.img_height, real_x, real_y, rect_width, rect_height)
                 rect_pixels = rect.cut_out_pixels(pixels)
 
