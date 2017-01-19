@@ -1,4 +1,3 @@
-from art_factory import all_sorters
 from .test_helper import *
 from pixel_sorting.pixel_sorters import *
 from PIL import Image
