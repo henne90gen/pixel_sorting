@@ -92,3 +92,17 @@ class ArtFactoryTest(TestCase):
             self.assertEqual(apply_sorter_to_image(argument), False)
         finally:
             shutil.rmtree(test_directory)
+
+    def testApplyFavoriteToImage(self):
+        test_image = "./pixel_sorting/tests/test_image.png"
+        try:
+            self.assertEqual(apply_favorite_sorters_to_image(test_image), 90)
+        finally:
+            shutil.rmtree("./pixel_sorting/tests/test_image_generated")
+
+    def testApplyFavoriteToDir(self):
+        try:
+            self.assertEqual(apply_favorite_sorters_to_dir("./pixel_sorting/tests"), 180)
+        finally:
+            shutil.rmtree("./pixel_sorting/tests/test_image_generated")
+            shutil.rmtree("./pixel_sorting/tests/test_image_sorters_generated")

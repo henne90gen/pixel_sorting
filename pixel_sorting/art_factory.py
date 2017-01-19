@@ -16,13 +16,6 @@ index = 0
 for s in all_sorters:
     if type(s) == Inverter:
         continue
-    keep_going = False
-    for check_s in all_sorters:
-        if type(check_s) == CheckerBoardSorter and type(check_s.sorter) == type(s):
-            keep_going = True
-            break
-    if keep_going:
-        continue
     all_sorters.append(CheckerBoardSorter(sorter=type(s)))
     index += 1
     if index >= max_index:

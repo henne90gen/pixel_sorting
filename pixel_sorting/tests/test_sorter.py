@@ -290,3 +290,31 @@ class SorterTests(unittest.TestCase):
     def testExtendedCheckerBoardSorter(self):
         board_sorter = ExtendedCheckerBoardSorter(16, 16)
         execute_sorter(self, board_sorter, self.board_square, self.board_square_result)
+
+    def testCopy(self):
+        sorter = ColumnSorter(6, 5, sort_criteria.built_in(), 2)
+        sort_copy = sorter.copy()
+        self.assertEqual(sort_copy.criteria, sorter.criteria)
+        self.assertEqual(sort_copy.name, sorter.name)
+        self.assertEqual(sort_copy.img_width, 6)
+        self.assertEqual(sort_copy.img_height, 5)
+        self.assertEqual(sort_copy.column, 2)
+
+        sorter = RowSorter(6, 5, sort_criteria.avg(), 3)
+        sort_copy = sorter.copy()
+        self.assertEqual(sort_copy.criteria, sorter.criteria)
+        self.assertEqual(sort_copy.name, sorter.name)
+        self.assertEqual(sort_copy.img_width, 6)
+        self.assertEqual(sort_copy.img_height, 5)
+        self.assertEqual(sort_copy.row, 3)
+
+        PixelSorter("").copy()
+
+        sorter = ExtendedCheckerBoardSorter(6, 5, sort_criteria.avg(), False, None, 3, 4)
+        sort_copy = sorter.copy()
+        self.assertEqual(sort_copy.criteria, sorter.criteria)
+        self.assertEqual(sort_copy.name, sorter.name)
+        self.assertEqual(sort_copy.img_width, 6)
+        self.assertEqual(sort_copy.img_height, 5)
+        self.assertEqual(sort_copy.width, 3)
+        self.assertEqual(sort_copy.height, 4)
