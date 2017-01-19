@@ -1,3 +1,4 @@
+from art_factory import all_sorters
 from .test_helper import *
 from pixel_sorting.pixel_sorters import *
 from PIL import Image
@@ -281,7 +282,19 @@ class SorterTests(unittest.TestCase):
                            86, 83, 84, 81, 82, 47, 48, 45, 46, 43, 44, 41, 42, 39, 40, 37, 38, 35, 36, 33, 34, 63, 64,
                            61, 62, 59, 60, 57, 58, 55, 56, 53, 54, 51, 52, 49, 50, 15, 16, 13, 14, 11, 12, 9, 10, 7, 8,
                            5, 6, 3, 4, 1, 2, 31, 32, 29, 30, 27, 28, 25, 26, 23, 24, 21, 22, 19, 20, 17, 18]
-    board_rect = []
+    board_extended_result = [137, 138, 139, 140, 141, 142, 143, 144, 129, 130, 131, 132, 133, 134, 135, 136, 153, 154,
+                             155, 156, 157, 158, 159, 160, 145, 146, 147, 148, 149, 150, 151, 152, 169, 170, 171, 172,
+                             173, 174, 175, 176, 161, 162, 163, 164, 165, 166, 167, 168, 185, 186, 187, 188, 189, 190,
+                             191, 192, 177, 178, 179, 180, 181, 182, 183, 184, 201, 202, 203, 204, 205, 206, 207, 208,
+                             193, 194, 195, 196, 197, 198, 199, 200, 217, 218, 219, 220, 221, 222, 223, 224, 209, 210,
+                             211, 212, 213, 214, 215, 216, 233, 234, 235, 236, 237, 238, 239, 240, 225, 226, 227, 228,
+                             229, 230, 231, 232, 249, 250, 251, 252, 253, 254, 255, 256, 241, 242, 243, 244, 245, 246,
+                             247, 248, 9, 10, 11, 12, 13, 14, 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 25, 26, 27, 28, 29, 30,
+                             31, 32, 17, 18, 19, 20, 21, 22, 23, 24, 41, 42, 43, 44, 45, 46, 47, 48, 33, 34, 35, 36, 37,
+                             38, 39, 40, 57, 58, 59, 60, 61, 62, 63, 64, 49, 50, 51, 52, 53, 54, 55, 56, 73, 74, 75, 76,
+                             77, 78, 79, 80, 65, 66, 67, 68, 69, 70, 71, 72, 89, 90, 91, 92, 93, 94, 95, 96, 81, 82, 83,
+                             84, 85, 86, 87, 88, 105, 106, 107, 108, 109, 110, 111, 112, 97, 98, 99, 100, 101, 102, 103,
+                             104, 121, 122, 123, 124, 125, 126, 127, 128, 113, 114, 115, 116, 117, 118, 119, 120]
 
     def testCheckerBoardSorter(self):
         board_sorter = CheckerBoardSorter(16, 16)
@@ -290,6 +303,11 @@ class SorterTests(unittest.TestCase):
     def testExtendedCheckerBoardSorter(self):
         board_sorter = ExtendedCheckerBoardSorter(16, 16)
         execute_sorter(self, board_sorter, self.board_square, self.board_square_result)
+
+        criterias = [sort_criteria.built_in()]
+        sorters = [BasicSorter]
+        board_sorter = ExtendedCheckerBoardSorter(16, 16, width=2, height=2, criterias=criterias, sorters=sorters)
+        execute_sorter(self, board_sorter, self.board_square, self.board_extended_result)
 
     def testCopy(self):
         sorter = ColumnSorter(6, 5, sort_criteria.built_in(), 2)

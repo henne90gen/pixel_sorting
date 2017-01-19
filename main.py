@@ -1,4 +1,4 @@
-from pixel_sorting.art_factory import apply_all_sorters_to_dir
+from pixel_sorting.art_factory import apply_favorite_sorters_to_dir
 
 
 def main():

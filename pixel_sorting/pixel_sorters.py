@@ -352,4 +352,7 @@ class ExtendedCheckerBoardSorter(PixelSorter):
 
                 rect_pixels = sorter.sort_pixels(pixels=rect_pixels)
                 pixels = rect.put_in_pixels(pixels, rect_pixels)
+
+                sorter_index += 1
+                criteria_index += 1
         return pixels
