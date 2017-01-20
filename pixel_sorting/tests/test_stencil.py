@@ -2,7 +2,7 @@ import os
 import unittest
 from PIL import Image
 from pixel_sorting.stencils import *
-from tests.test_helper import create_test_image
+from .test_helper import create_test_image
 
 stencil_png = "./pixel_sorting/tests/stencil.png"
 
