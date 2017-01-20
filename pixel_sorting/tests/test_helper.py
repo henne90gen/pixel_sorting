@@ -6,11 +6,19 @@ from PIL import Image
 from pixel_sorting.pixel_sorters import BasicSorter, CircleSorter
 from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
 
+helper_png = "./pixel_sorting/tests/helper.png"
+
 
 class HelperTest(unittest.TestCase):
+    def setUp(self):
+        create_test_image(helper_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+
+    def tearDown(self):
+        os.remove(helper_png)
+
     def testSaveToCopy(self):
         path = "./pixel_sorting/tests/"
-        filename = "test_image.png"
+        filename = "helper.png"
         img = Image.open(path + filename)
         pixels = get_pixels(img)
         save_to_copy(img, pixels, path + "copy_" + filename)
@@ -69,15 +77,21 @@ def get_expected_files_per_image(tester):
     return (len(tester.expected_sorters) - 1) * len(tester.expected_criteria) + 1
 
 
-def assert_generated_directory(tester, directory, extension):
+def create_test_image(filename, width, height, pixels, mode="L"):
+    img = Image.new(mode, (width, height))
+    img.putdata(pixels)
+    img.save(filename)
+
+
+def assert_generated_directory(tester, directory, expected_sorters, expected_criteria, extension):
     num_expected_files_per_image = get_expected_files_per_image(tester)
 
     tester.assertTrue(os.path.exists(directory))
     num_files = len(
         [name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
     tester.assertEqual(num_files, num_expected_files_per_image)
-    for sorter in tester.expected_sorters:
-        for criteria in tester.expected_criteria:
+    for sorter in expected_sorters:
+        for criteria in expected_criteria:
             image_path = directory + sorter + criteria + extension
             if sorter == "Inverter":
                 image_path = directory + sorter + extension

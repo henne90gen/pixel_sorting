@@ -2,13 +2,20 @@ from .test_helper import *
 from pixel_sorting.pixel_sorters import *
 from PIL import Image
 
-test_image_path = "./pixel_sorting/tests/test_image_sorters.jpg"
+sorters_png = "./pixel_sorting/tests/sorters.png"
 
 
 class SorterTests(unittest.TestCase):
+    def setUp(self):
+        create_test_image(sorters_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        self.stencil_img = Image.open(sorters_png)
+
+    def tearDown(self):
+        os.remove(sorters_png)
+
     def testPixelSorter(self):
         sorter = PixelSorter("")
-        sorter_img = Image.open(test_image_path)
+        sorter_img = Image.open(sorters_png)
         sorter_pixels = []
         self.assertEqual(sorter.sort_image(sorter_img), None)
         self.assertEqual(sorter.sort_pixels(sorter_pixels), None)
@@ -236,7 +243,7 @@ class SorterTests(unittest.TestCase):
             self.assertTrue(p in self.circle_result)
 
     def testCircleSorterWithRealFile(self):
-        img = Image.open(test_image_path)
+        img = Image.open(sorters_png)
         img_width = img.size[0]
         img_height = img.size[1]
 

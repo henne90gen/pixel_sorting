@@ -1,15 +1,23 @@
+import os
 import unittest
 from PIL import Image
 from pixel_sorting.stencils import *
+from tests.test_helper import create_test_image
 
-test_image_path = "./pixel_sorting/tests/test_image.png"
+stencil_png = "./pixel_sorting/tests/stencil.png"
 
 
 class StencilTests(unittest.TestCase):
 
     stencil_pixels = []
-    stencil_img = Image.open(test_image_path)
     stencil_input_pixels = []
+
+    def setUp(self):
+        create_test_image(stencil_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        self.stencil_img = Image.open(stencil_png)
+
+    def tearDown(self):
+        os.remove(stencil_png)
 
     def testStencil(self):
         stencil = Stencil(4, 4, 2, 2)

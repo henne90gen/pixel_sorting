@@ -4,7 +4,7 @@ from time import sleep
 from unittest import TestCase
 
 from pixel_sorting.art_factory import *
-from .test_helper import assert_generated_directory, get_expected_files_per_image
+from .test_helper import assert_generated_directory, get_expected_files_per_image, create_test_image
 
 
 class ArtFactoryTest(TestCase):
@@ -48,39 +48,50 @@ class ArtFactoryTest(TestCase):
                          "HalfThresholdSaturation"]
 
     def testApplySortersToImage(self):
-        apply_all_sorters_to_image("./pixel_sorting/tests/test_image.png")
-        image_folder = "./pixel_sorting/tests/test_image_generated/"
+        art_factory_image = "./pixel_sorting/tests/applySortersToImage.png"
+        create_test_image(art_factory_image, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        image_folder = "./pixel_sorting/tests/applySortersToImage_generated/"
 
         try:
-            assert_generated_directory(self, image_folder, ".png")
+            apply_all_sorters_to_image(art_factory_image)
+            assert_generated_directory(self, image_folder, self.expected_sorters, self.expected_criteria, ".png")
         finally:
+            os.remove(art_factory_image)
             shutil.rmtree(image_folder)
 
     def testApplySortersToDir(self):
-        test_directory = "./pixel_sorting/tests/"
+        test_directory = "./pixel_sorting/tests/applySortersToDir/"
+        os.mkdir(test_directory)
+
+        test_img1 = "img1.png"
+        create_test_image(test_directory + test_img1, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+
+        test_img2 = "img2.jpg"
+        create_test_image(test_directory + test_img2, 5, 5, [(i, i, i) for i in range(25)], "RGB")
 
         try:
             apply_all_sorters_to_dir(test_directory)
 
-            test_dir_1 = test_directory + "test_image_generated/"
-            assert_generated_directory(self, test_dir_1, ".png")
+            test_dir_1 = test_directory + "img1_generated/"
+            assert_generated_directory(self, test_dir_1, self.expected_sorters, self.expected_criteria, ".png")
 
-            test_dir_2 = test_directory + "test_image_sorters_generated/"
-            assert_generated_directory(self, test_dir_2, ".jpg")
+            test_dir_2 = test_directory + "img2_generated/"
+            assert_generated_directory(self, test_dir_2, self.expected_sorters, self.expected_criteria, ".jpg")
         finally:
-            shutil.rmtree("./pixel_sorting/tests/test_image_generated")
-            shutil.rmtree("./pixel_sorting/tests/test_image_sorters_generated")
+            shutil.rmtree(test_directory)
 
     def testIsGeneratedImage(self):
         self.assertTrue(is_generated_image("/generated_some_folder/some_image.jpg"))
         self.assertFalse(is_generated_image("./res/city_folder/city.png"))
 
     def testApplySorterToImage(self):
-        image = Image.open("./pixel_sorting/tests/test_image.png")
+        image_name = "./pixel_sorting/tests/applySorterToImage.png"
+        create_test_image(image_name, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        image = Image.open(image_name)
         sorter_template = BasicSorter()
         criteria = "BuiltIn"
         extension = ".png"
-        test_directory = "./pixel_sorting/tests/test_image_generated/"
+        test_directory = "./pixel_sorting/tests/applySorterToImage_generated/"
         path_to_image = get_generated_image_path(test_directory, sorter_template,
                                                  criteria, extension)
         argument = [path_to_image, sorter_template, criteria, image.size[0], image.size[1], image.mode,
@@ -91,18 +102,29 @@ class ArtFactoryTest(TestCase):
             self.assertEqual(apply_sorter_to_image(argument), True)
             self.assertEqual(apply_sorter_to_image(argument), False)
         finally:
+            os.remove(image_name)
             shutil.rmtree(test_directory)
 
     def testApplyFavoriteToImage(self):
-        test_image = "./pixel_sorting/tests/test_image.png"
+        test_image = "./pixel_sorting/tests/applyFavoriteToImage.png"
+        pixels = [(i, i, i) for i in range(25)]
+        create_test_image(test_image, 5, 5, pixels, "RGB")
         try:
             self.assertEqual(apply_favorite_sorters_to_image(test_image), 90)
         finally:
-            shutil.rmtree("./pixel_sorting/tests/test_image_generated")
+            shutil.rmtree("./pixel_sorting/tests/applyFavoriteToImage_generated")
+            os.remove(test_image)
 
     def testApplyFavoriteToDir(self):
+        test_dir = "./pixel_sorting/tests/applyFavoriteToDir"
+        os.mkdir(test_dir)
+
+        test_image1 = "./pixel_sorting/tests/applyFavoriteToDir/applyFavoriteToDir1.png"
+        test_image2 = "./pixel_sorting/tests/applyFavoriteToDir/applyFavoriteToDir2.png"
+        pixels = [(i, i, i) for i in range(25)]
+        create_test_image(test_image1, 5, 5, pixels, "RGB")
+        create_test_image(test_image2, 5, 5, pixels, "RGB")
         try:
-            self.assertEqual(apply_favorite_sorters_to_dir("./pixel_sorting/tests"), 180)
+            self.assertEqual(apply_favorite_sorters_to_dir(test_dir), 180)
         finally:
-            shutil.rmtree("./pixel_sorting/tests/test_image_generated")
-            shutil.rmtree("./pixel_sorting/tests/test_image_sorters_generated")
+            shutil.rmtree(test_dir)
