@@ -1,13 +1,11 @@
-import os
 import shutil
-from time import sleep
-from unittest import TestCase
+import unittest
 
 from pixel_sorting.art_factory import *
 from .test_helper import assert_generated_directory, get_expected_files_per_image, create_test_image
 
 
-class ArtFactoryTest(TestCase):
+class ArtFactoryTest(unittest.TestCase):
     image_tests = [("image.png", True), ("image.PnG", True), ("image.PNG", True), ("image.JPG", True),
                    ("image.jpg", True), ("image.pn", False), ("imagepng", False), ("image,jpg", False)]
 
@@ -128,3 +126,7 @@ class ArtFactoryTest(TestCase):
             self.assertEqual(apply_favorite_sorters_to_dir(test_dir), 180)
         finally:
             shutil.rmtree(test_dir)
+
+
+if __name__ == '__main__':
+    unittest.main()

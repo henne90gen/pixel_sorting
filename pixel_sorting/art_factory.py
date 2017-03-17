@@ -48,7 +48,7 @@ def apply_sorters_to_image(argument):
     """
     sorters = argument[0]
     path_to_image = argument[1]
-    print("Started generating for " + path_to_image)
+    # print("Started generating for " + path_to_image)
 
     image = Image.open(path_to_image)
     img_mode = image.mode
@@ -106,7 +106,7 @@ def apply_sorter_to_image(argument):
     temp_pixels = [p for p in argument[6]]
     sorter.sort_pixels(temp_pixels)
     save_to_img(argument[3], argument[4], argument[5], temp_pixels, argument[0])
-    print("Generated", argument[0])
+    # print("Generated", argument[0])
     return True
 
 

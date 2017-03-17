@@ -29,6 +29,7 @@ def save_to_img(width, height, mode, pixels, filename):
     new_image = Image.new(mode, (width, height))
     new_image.putdata(pixels)
     new_image.save(filename)
+    new_image.close()
 
 
 def is_image_file(filename):
