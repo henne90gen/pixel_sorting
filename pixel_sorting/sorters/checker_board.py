@@ -1,7 +1,7 @@
-import sort_criteria
-from helper import get_sorter_name
-from sorters.basic import BasicSorter, PixelSorter
-from stencils import RectangleStencil
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.helper import get_sorter_name
+from pixel_sorting.sorters.basic import BasicSorter, PixelSorter
+from pixel_sorting.stencils import RectangleStencil
 
 
 class CheckerBoardSorter(PixelSorter):

@@ -1,7 +1,7 @@
 import shutil
 import unittest
 
-from helper import is_image_file, is_generated_image
+from pixel_sorting.helper import is_image_file, is_generated_image
 from pixel_sorting.art_factory import *
 from tests.test_helper import assert_generated_directory, create_test_image
 

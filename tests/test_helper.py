@@ -6,10 +6,10 @@ from PIL import Image
 
 from pixel_sorting.sorters.basic import BasicSorter
 from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
-from sorters.circle import CircleSorter
-from sorters.column import AlternatingColumnSorter, ColumnSorter
-from sorters.diamond import DiamondSorter
-from sorters.row import AlternatingRowSorter, RowSorter
+from pixel_sorting.sorters.circle import CircleSorter
+from pixel_sorting.sorters.column import AlternatingColumnSorter, ColumnSorter
+from pixel_sorting.sorters.diamond import DiamondSorter
+from pixel_sorting.sorters.row import AlternatingRowSorter, RowSorter
 
 helper_png = "./helper.png"
 

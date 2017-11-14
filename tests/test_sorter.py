@@ -1,6 +1,6 @@
-import sort_criteria
-from sorters.basic import PixelSorter, Inverter
-from sorters.checker_board import CheckerBoardSorter, ExtendedCheckerBoardSorter
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.sorters.basic import PixelSorter, Inverter
+from pixel_sorting.sorters.checker_board import CheckerBoardSorter, ExtendedCheckerBoardSorter
 from tests.test_helper import *
 
 logging.getLogger().setLevel(logging.ERROR)

@@ -1,5 +1,5 @@
-import sort_criteria
-from helper import get_pixels
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.helper import get_pixels
 
 
 class PixelSorter(object):

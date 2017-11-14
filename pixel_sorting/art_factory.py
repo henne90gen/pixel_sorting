@@ -5,14 +5,14 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 from PIL import Image
 
-import sort_criteria
-from helper import get_image_files, get_pixels, get_extension, remove_extension, save_to_img
-from sorters.basic import BasicSorter, Inverter
-from sorters.checker_board import CheckerBoardSorter
-from sorters.circle import CircleSorter
-from sorters.column import AlternatingColumnSorter
-from sorters.diamond import DiamondSorter
-from sorters.row import AlternatingRowSorter
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.helper import get_image_files, get_pixels, get_extension, remove_extension, save_to_img
+from pixel_sorting.sorters.basic import BasicSorter, Inverter
+from pixel_sorting.sorters.checker_board import CheckerBoardSorter
+from pixel_sorting.sorters.circle import CircleSorter
+from pixel_sorting.sorters.column import AlternatingColumnSorter
+from pixel_sorting.sorters.diamond import DiamondSorter
+from pixel_sorting.sorters.row import AlternatingRowSorter
 
 log = logging.getLogger()
 handler = logging.StreamHandler()

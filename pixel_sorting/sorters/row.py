@@ -1,5 +1,5 @@
-import sort_criteria
-from sorters.basic import PixelSorter
+import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting.sorters.basic import PixelSorter
 
 
 class RowSorter(PixelSorter):
