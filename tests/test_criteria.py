@@ -1,5 +1,8 @@
+import logging
 from unittest import TestCase
 from pixel_sorting.sort_criteria import *
+
+logging.getLogger().setLevel(logging.ERROR)
 
 
 class CriteriaTest(TestCase):

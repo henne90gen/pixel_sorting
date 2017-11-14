@@ -1,9 +1,11 @@
+import logging
 import os
 import unittest
 from PIL import Image
 from pixel_sorting.stencils import *
 from tests.test_helper import create_test_image
 
+logging.getLogger().setLevel(logging.ERROR)
 stencil_png = "./stencil.png"
 
 

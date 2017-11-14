@@ -1,8 +1,14 @@
+import logging
+import sys
 import time
 from multiprocessing.dummy import Pool as ThreadPool
 
 from pixel_sorting.helper import *
 from pixel_sorting.pixel_sorters import *
+
+log = logging.getLogger()
+log.addHandler(logging.StreamHandler(sys.stdout))
+log.setLevel(logging.INFO)
 
 all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
                AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
@@ -45,7 +51,7 @@ def apply_sorters_to_image(argument):
     1: path to image
     """
     sorters, path_to_image = argument
-    print("Started generating for " + path_to_image)
+    log.info("Started generating images for " + path_to_image)
 
     image = Image.open(path_to_image)
     img_mode = image.mode
@@ -54,11 +60,11 @@ def apply_sorters_to_image(argument):
     img_pixels = get_pixels(image)
     extension = get_extension(path_to_image)
 
-    image_folder = remove_extension(path_to_image) + "_generated/"
+    image_folder = remove_extension(path_to_image) + "/"
     if not os.path.exists(image_folder):
         os.makedirs(image_folder)
 
-    thread_pool = ThreadPool(processes=12)
+    thread_pool = ThreadPool(processes=4)
 
     arguments = []
 
@@ -103,15 +109,15 @@ def apply_sorter_to_image(argument):
     temp_pixels = [p for p in argument[6]]
     sorter.sort_pixels(temp_pixels)
     save_to_img(argument[3], argument[4], argument[5], temp_pixels, argument[0])
-    # print("Generated", argument[0])
+    log.info("Generated " + argument[0])
     return True
 
 
 def apply_sorters_to_dir(path_to_dir, func_to_call):
     image_files = get_image_files(path_to_dir)
-    print("Generating sorted images for:")
+    log.info("Generating sorted images for:")
     for image in image_files:
-        print(image)
+        log.info(image)
 
     start_time = time.time()
 
@@ -124,9 +130,7 @@ def apply_sorters_to_dir(path_to_dir, func_to_call):
     time_diff = stop_time - start_time
 
     total_generated = sum(num_generated_list)
-    print()
-    print("Done. Generated " + str(total_generated) + " sorted images in " + str(time_diff))
-    print()
+    log.info("Done. Generated " + str(total_generated) + " sorted images in " + str(time_diff) + "s")
     return total_generated
 
 

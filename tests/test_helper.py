@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest
 
@@ -8,6 +9,7 @@ from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove
 
 helper_png = "./helper.png"
 
+logging.getLogger().setLevel(logging.ERROR)
 
 class HelperTest(unittest.TestCase):
     def setUp(self):
