@@ -1,13 +1,14 @@
 import logging
+import os
 import time
 from multiprocessing.dummy import Pool as ThreadPool
 
-import os
 from PIL import Image
 
 import sort_criteria
 from helper import get_image_files, get_pixels, get_extension, remove_extension, save_to_img
-from pixel_sorters import BasicSorter, Inverter, CheckerBoardSorter
+from sorters.basic import BasicSorter, Inverter
+from sorters.checker_board import CheckerBoardSorter
 from sorters.circle import CircleSorter
 from sorters.column import AlternatingColumnSorter
 from sorters.diamond import DiamondSorter
@@ -37,12 +38,6 @@ for s in all_sorters:
 favorite_sorters = [CheckerBoardSorter(sorter=AlternatingRowSorter), AlternatingRowSorter(),
                     AlternatingRowSorter(alternation=10), AlternatingColumnSorter(),
                     AlternatingColumnSorter(alternation=10)]
-
-
-class ArtFactory:
-    def __init__(self, path):
-        self.path = path
-        self.images_files = get_image_files(self.path)
 
 
 def get_generated_image_path(image_folder, sorter, criteria, extension):
@@ -132,7 +127,7 @@ def apply_sorters_to_dir(path_to_dir, func_to_call):
     image_files = get_image_files(path_to_dir)
     log.info("Generating sorted images for:")
     for image in image_files:
-        log.info(image)
+        log.info("\t" + image)
 
     start_time = time.time()
 

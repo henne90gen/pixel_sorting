@@ -1,5 +1,5 @@
 import sort_criteria
-from pixel_sorters import PixelSorter
+from sorters.basic import PixelSorter
 
 
 class ColumnSorter(PixelSorter):

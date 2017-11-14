@@ -4,7 +4,7 @@ import unittest
 
 from PIL import Image
 
-from pixel_sorting.pixel_sorters import BasicSorter
+from pixel_sorting.sorters.basic import BasicSorter
 from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
 from sorters.circle import CircleSorter
 from sorters.column import AlternatingColumnSorter, ColumnSorter
@@ -14,6 +14,7 @@ from sorters.row import AlternatingRowSorter, RowSorter
 helper_png = "./helper.png"
 
 logging.getLogger().setLevel(logging.ERROR)
+
 
 class HelperTest(unittest.TestCase):
     def setUp(self):

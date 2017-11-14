@@ -1,7 +1,7 @@
 import math
 
 import sort_criteria
-from pixel_sorters import PixelSorter
+from sorters.basic import PixelSorter
 
 
 class DiamondSorter(PixelSorter):
