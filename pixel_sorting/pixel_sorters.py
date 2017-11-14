@@ -143,7 +143,8 @@ class DiamondSorter(PixelSorter):
     def copy(self):
         return DiamondSorter(self.img_width, self.img_height, self.criteria, self.reverse)
 
-    def next_position(self, pos):
+    @staticmethod
+    def next_position(pos):
         x = pos[0]
         y = pos[1]
         if x == 0 and y == 0:

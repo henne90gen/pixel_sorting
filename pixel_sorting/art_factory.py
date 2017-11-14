@@ -1,16 +1,14 @@
-import os
+import time
 from multiprocessing.dummy import Pool as ThreadPool
 
-import time
-
-import pixel_sorting.sort_criteria as sort_criteria
-from pixel_sorting.pixel_sorters import *
 from pixel_sorting.helper import *
+from pixel_sorting.pixel_sorters import *
 
 all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
                AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
                AlternatingColumnSorter(alternation=10), AlternatingColumnSorter(alternation=100), DiamondSorter(),
                CircleSorter()]
+
 max_index = len(all_sorters)
 index = 0
 for s in all_sorters:
@@ -33,11 +31,11 @@ def get_generated_image_path(image_folder, sorter, criteria, extension):
 
 
 def apply_all_sorters_to_image(path_to_image):
-    return apply_sorters_to_image([all_sorters, path_to_image])
+    return apply_sorters_to_image((all_sorters, path_to_image))
 
 
 def apply_favorite_sorters_to_image(path_to_image):
-    return apply_sorters_to_image([favorite_sorters, path_to_image])
+    return apply_sorters_to_image((favorite_sorters, path_to_image))
 
 
 def apply_sorters_to_image(argument):
@@ -46,9 +44,8 @@ def apply_sorters_to_image(argument):
     0: array of sorter templates
     1: path to image
     """
-    sorters = argument[0]
-    path_to_image = argument[1]
-    # print("Started generating for " + path_to_image)
+    sorters, path_to_image = argument
+    print("Started generating for " + path_to_image)
 
     image = Image.open(path_to_image)
     img_mode = image.mode

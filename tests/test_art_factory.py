@@ -126,7 +126,3 @@ class ArtFactoryTest(unittest.TestCase):
             self.assertEqual(apply_favorite_sorters_to_dir(test_dir), 180)
         finally:
             shutil.rmtree(test_dir)
-
-
-if __name__ == '__main__':
-    unittest.main()
