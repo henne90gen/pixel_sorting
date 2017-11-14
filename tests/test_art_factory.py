@@ -1,8 +1,9 @@
 import shutil
 import unittest
 
+from helper import is_image_file, is_generated_image
 from pixel_sorting.art_factory import *
-from tests.test_helper import assert_generated_directory, get_expected_files_per_image, create_test_image
+from tests.test_helper import assert_generated_directory, create_test_image
 
 logging.getLogger().setLevel(logging.ERROR)
 

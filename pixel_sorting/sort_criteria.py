@@ -61,7 +61,7 @@ def threshold(criteria, num):
     return lambda pixel: criteria(pixel) if criteria(pixel) > num else 0
 
 
-def get_center_threshold(crit_str):
+def get_half_threshold(crit_str):
     if crit_str == "Red" or crit_str == "Green" or crit_str == "Blue" or crit_str == "Average" or crit_str == "Brightness":
         return 256 / 2
     elif crit_str == "Hue":
@@ -76,5 +76,5 @@ all_criteria = {"BuiltIn": built_in(), "Red": red(), "Green": green(), "Blue": b
                 "Average": avg(), "Hue": hue(), "Saturation": saturation(), "Lightness": lightness()}
 thresholds = {}
 for crit in all_criteria:
-    thresholds["HalfThreshold" + crit] = threshold(all_criteria[crit], get_center_threshold(crit))
+    thresholds["HalfThreshold" + crit] = threshold(all_criteria[crit], get_half_threshold(crit))
 all_criteria.update(thresholds)

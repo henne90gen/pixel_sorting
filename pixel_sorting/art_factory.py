@@ -1,13 +1,22 @@
 import logging
-import sys
 import time
 from multiprocessing.dummy import Pool as ThreadPool
 
-from pixel_sorting.helper import *
-from pixel_sorting.pixel_sorters import *
+import os
+from PIL import Image
+
+import sort_criteria
+from helper import get_image_files, get_pixels, get_extension, remove_extension, save_to_img
+from pixel_sorters import BasicSorter, Inverter, CheckerBoardSorter
+from sorters.circle import CircleSorter
+from sorters.column import AlternatingColumnSorter
+from sorters.diamond import DiamondSorter
+from sorters.row import AlternatingRowSorter
 
 log = logging.getLogger()
-log.addHandler(logging.StreamHandler(sys.stdout))
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("[%(asctime)s - %(levelname)s] %(message)s"))
+log.addHandler(handler)
 log.setLevel(logging.INFO)
 
 all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
@@ -28,6 +37,12 @@ for s in all_sorters:
 favorite_sorters = [CheckerBoardSorter(sorter=AlternatingRowSorter), AlternatingRowSorter(),
                     AlternatingRowSorter(alternation=10), AlternatingColumnSorter(),
                     AlternatingColumnSorter(alternation=10)]
+
+
+class ArtFactory:
+    def __init__(self, path):
+        self.path = path
+        self.images_files = get_image_files(self.path)
 
 
 def get_generated_image_path(image_folder, sorter, criteria, extension):

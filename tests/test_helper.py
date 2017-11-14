@@ -4,8 +4,12 @@ import unittest
 
 from PIL import Image
 
-from pixel_sorting.pixel_sorters import BasicSorter, CircleSorter
+from pixel_sorting.pixel_sorters import BasicSorter
 from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
+from sorters.circle import CircleSorter
+from sorters.column import AlternatingColumnSorter, ColumnSorter
+from sorters.diamond import DiamondSorter
+from sorters.row import AlternatingRowSorter, RowSorter
 
 helper_png = "./helper.png"
 
@@ -38,6 +42,11 @@ class HelperTest(unittest.TestCase):
     def testGetSorterName(self):
         self.assertEqual("BasicSorter", get_sorter_name(BasicSorter))
         self.assertEqual("CircleSorter", get_sorter_name(CircleSorter))
+        self.assertEqual("DiamondSorter", get_sorter_name(DiamondSorter))
+        self.assertEqual("RowSorter", get_sorter_name(RowSorter))
+        self.assertEqual("AlternatingRowSorter", get_sorter_name(AlternatingRowSorter))
+        self.assertEqual("ColumnSorter", get_sorter_name(ColumnSorter))
+        self.assertEqual("AlternatingColumnSorter", get_sorter_name(AlternatingColumnSorter))
 
 
 def execute_sorter(tester, sorter, input_pixels, expected_result):

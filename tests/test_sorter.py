@@ -1,6 +1,11 @@
-from tests.test_helper import *
-from pixel_sorting.pixel_sorters import *
 from PIL import Image
+
+import sort_criteria
+from pixel_sorters import PixelSorter, Inverter, CheckerBoardSorter, ExtendedCheckerBoardSorter
+from sorters.column import AlternatingColumnSorter, ColumnSorter
+from sorters.diamond import DiamondSorter
+from sorters.row import AlternatingRowSorter, RowSorter
+from tests.test_helper import *
 
 logging.getLogger().setLevel(logging.ERROR)
 sorters_png = "./sorters.png"

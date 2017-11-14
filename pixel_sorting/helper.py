@@ -63,18 +63,12 @@ def remove_extension(path):
 
 
 def get_image_files(path_to_dir):
-    image_files = []
     image_files = os.listdir(path_to_dir)
     return list(map(lambda x: os.path.join(path_to_dir, x), filter(lambda x: is_image_file(x), image_files)))
-    # for dir_name, sub_dir_names, file_names in os.walk(path_to_dir):
-    #     for filename in file_names:
-    #         if is_image_file(filename) and not is_generated_image(os.path.join(dir_name, filename)):
-    #             image_files.append(os.path.join(dir_name, filename))
-    # return image_files
 
 
 def get_sorter_name(sorter):
     result = str(sorter)
-    result = result[36:]
+    result = result.split(".")[-1]
     result = result[:-2]
     return result
