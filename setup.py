@@ -9,5 +9,5 @@ setup(name='pixel_sorting',
       license='GPL',
       packages=['pixel_sorting'],
       zip_safe=False,
-      test_suite="pixel_sorting.tests",
+      test_suite="tests",
       install_requires=['Pillow'])

@@ -1,8 +1,8 @@
-from .test_helper import *
+from tests.test_helper import *
 from pixel_sorting.pixel_sorters import *
 from PIL import Image
 
-sorters_png = "./pixel_sorting/tests/sorters.png"
+sorters_png = "./sorters.png"
 
 
 class SorterTests(unittest.TestCase):

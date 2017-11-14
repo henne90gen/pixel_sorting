@@ -1,8 +1,5 @@
 .idea/
 __pycache__/
-res/
 *.egg-info
-.cache/
-pixel_sorting/PixelSorters.pyc
-pixel_sorting/SortCriteria.pyc
-pixel_sorting/__init__.pyc
+dist
+build

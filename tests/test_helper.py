@@ -6,7 +6,7 @@ from PIL import Image
 from pixel_sorting.pixel_sorters import BasicSorter, CircleSorter
 from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
 
-helper_png = "./pixel_sorting/tests/helper.png"
+helper_png = "./helper.png"
 
 
 class HelperTest(unittest.TestCase):
@@ -17,7 +17,7 @@ class HelperTest(unittest.TestCase):
         os.remove(helper_png)
 
     def testSaveToCopy(self):
-        path = "./pixel_sorting/tests/"
+        path = "./"
         filename = "helper.png"
         img = Image.open(path + filename)
         pixels = get_pixels(img)

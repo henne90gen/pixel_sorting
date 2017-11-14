@@ -2,9 +2,9 @@ import os
 import unittest
 from PIL import Image
 from pixel_sorting.stencils import *
-from .test_helper import create_test_image
+from tests.test_helper import create_test_image
 
-stencil_png = "./pixel_sorting/tests/stencil.png"
+stencil_png = "./stencil.png"
 
 
 class StencilTests(unittest.TestCase):
