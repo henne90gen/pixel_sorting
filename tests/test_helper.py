@@ -1,11 +1,13 @@
 import logging
 import os
+import shutil
 import unittest
 
 from PIL import Image
 
 from pixel_sorting.sorters.basic import BasicSorter
-from pixel_sorting.helper import get_pixels, save_to_copy, get_extension, remove_extension, get_sorter_name
+from pixel_sorting.helper import get_pixels, save_to_copy, remove_extension, get_sorter_name, PixelImage, \
+    get_image_files, is_image_file, is_generated_image
 from pixel_sorting.sorters.circle import CircleSorter
 from pixel_sorting.sorters.column import AlternatingColumnSorter, ColumnSorter
 from pixel_sorting.sorters.diamond import DiamondSorter
@@ -33,9 +35,6 @@ class HelperTest(unittest.TestCase):
         self.assertTrue(os.path.exists(path + "copy_" + filename), "No copy was created.")
         os.remove(path + "copy_" + filename)
 
-    def testGetExtension(self):
-        self.assertEqual(get_extension("hello.jpg"), "jpg")
-
     def testRemoveExtension(self):
         self.assertEqual("hello", remove_extension("hello.jpg"))
         self.assertEqual("./hello", remove_extension("./hello.jpg"))
@@ -48,6 +47,38 @@ class HelperTest(unittest.TestCase):
         self.assertEqual("AlternatingRowSorter", get_sorter_name(AlternatingRowSorter))
         self.assertEqual("ColumnSorter", get_sorter_name(ColumnSorter))
         self.assertEqual("AlternatingColumnSorter", get_sorter_name(AlternatingColumnSorter))
+
+    test_directory = "./images/"
+    test_images = ["hello.png", "What.Up", "test.jpg", "hey/here.png"]
+    expected_image_paths = [test_directory + "test.jpg", test_directory + "hello.png"]
+
+    def testGetImageFiles(self):
+        if not os.path.exists(self.test_directory):
+            os.makedirs(self.test_directory)
+
+        for file in self.test_images:
+            if not os.path.exists(self.test_directory + file):
+                k = file.rfind("/")
+                if k != -1:
+                    os.makedirs(self.test_directory + file[:k])
+            open(self.test_directory + file, 'w').close()
+
+        image_files = get_image_files(self.test_directory)
+        for image in self.expected_image_paths:
+            self.assertTrue(image in image_files)
+
+        shutil.rmtree(self.test_directory)
+
+    image_tests = [("image.png", True), ("image.PnG", True), ("image.PNG", True), ("image.JPG", True),
+                   ("image.jpg", True), ("image.pn", False), ("imagepng", False), ("image,jpg", False)]
+
+    def testIsImageFile(self):
+        for test in self.image_tests:
+            self.assertEqual(is_image_file(test[0]), test[1])
+
+    def testIsGeneratedImage(self):
+        self.assertTrue(is_generated_image("/generated_some_folder/some_image.jpg"))
+        self.assertFalse(is_generated_image("./res/city_folder/city.png"))
 
 
 def execute_sorter(tester, sorter, input_pixels, expected_result):

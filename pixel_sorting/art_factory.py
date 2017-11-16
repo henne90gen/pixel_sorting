@@ -1,13 +1,17 @@
 import logging
 import os
 import time
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing import Process
+from multiprocessing.pool import ThreadPool
+from queue import Queue
+from typing import List
 
 from PIL import Image
 
 import pixel_sorting.sort_criteria as sort_criteria
-from pixel_sorting.helper import get_image_files, get_pixels, get_extension, remove_extension, save_to_img
-from pixel_sorting.sorters.basic import BasicSorter, Inverter
+from pixel_sorting.helper import get_image_files, get_pixels, remove_extension, save_to_img, get_images, get_extension, \
+    Timer, SortingImage, PixelImage
+from pixel_sorting.sorters.basic import PixelSorter, BasicSorter, Inverter
 from pixel_sorting.sorters.checker_board import CheckerBoardSorter
 from pixel_sorting.sorters.circle import CircleSorter
 from pixel_sorting.sorters.column import AlternatingColumnSorter
@@ -20,24 +24,29 @@ handler.setFormatter(logging.Formatter("[%(asctime)s - %(levelname)s] %(message)
 log.addHandler(handler)
 log.setLevel(logging.INFO)
 
-all_sorters = [BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
-               AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
-               AlternatingColumnSorter(alternation=10), AlternatingColumnSorter(alternation=100), DiamondSorter(),
-               CircleSorter()]
-
-max_index = len(all_sorters)
-index = 0
-for s in all_sorters:
-    if type(s) == Inverter:
-        continue
-    all_sorters.append(CheckerBoardSorter(sorter=type(s)))
-    index += 1
-    if index >= max_index:
-        break
-
 favorite_sorters = [CheckerBoardSorter(sorter=AlternatingRowSorter), AlternatingRowSorter(),
                     AlternatingRowSorter(alternation=10), AlternatingColumnSorter(),
                     AlternatingColumnSorter(alternation=10)]
+
+
+def get_all_sorters() -> List[PixelSorter]:
+    all_sorters = []
+    all_sorters.extend([BasicSorter(), Inverter(), AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
+                        AlternatingRowSorter(alternation=100), AlternatingColumnSorter(),
+                        AlternatingColumnSorter(alternation=10), AlternatingColumnSorter(alternation=100),
+                        DiamondSorter(), CircleSorter()])
+
+    max_index = len(all_sorters)
+    index = 0
+    for s in all_sorters:
+        if type(s) == Inverter:
+            continue
+        all_sorters.append(CheckerBoardSorter(sorter=type(s)))
+        index += 1
+        if index >= max_index:
+            break
+
+    return all_sorters
 
 
 def get_generated_image_path(image_folder, sorter, criteria, extension):
@@ -46,107 +55,66 @@ def get_generated_image_path(image_folder, sorter, criteria, extension):
     return image_folder + sorter.to_string() + criteria + "." + extension
 
 
-def apply_all_sorters_to_image(path_to_image):
-    return apply_sorters_to_image((all_sorters, path_to_image))
+def run_sorters_on_directory(path_to_dir):
+    images = get_images(path_to_dir)
 
-
-def apply_favorite_sorters_to_image(path_to_image):
-    return apply_sorters_to_image((favorite_sorters, path_to_image))
-
-
-def apply_sorters_to_image(argument):
-    """
-    :param argument:
-    0: array of sorter templates
-    1: path to image
-    """
-    sorters, path_to_image = argument
-    log.info("Started generating images for " + path_to_image)
-
-    image = Image.open(path_to_image)
-    img_mode = image.mode
-    img_width = image.size[0]
-    img_height = image.size[1]
-    img_pixels = get_pixels(image)
-    extension = get_extension(path_to_image)
-
-    image_folder = remove_extension(path_to_image) + "/"
-    if not os.path.exists(image_folder):
-        os.makedirs(image_folder)
-
-    thread_pool = ThreadPool(processes=4)
-
-    arguments = []
-
-    for sorter_template in sorters:
-        for criteria in sort_criteria.all_criteria:
-            image_path = get_generated_image_path(image_folder, sorter_template, criteria, extension)
-
-            arguments.append([image_path, sorter_template, criteria, img_width, img_height, img_mode, img_pixels])
-            if isinstance(sorter_template, Inverter):
-                break
-
-    result_list = thread_pool.map(apply_sorter_to_image, arguments)
-    image.close()
-    thread_pool.close()
-    thread_pool.join()
-
-    num_generated = 0
-    for result in result_list:
-        if result:
-            num_generated += 1
-    return num_generated
-
-
-def apply_sorter_to_image(argument):
-    """
-    Uses a tuple of arguments, because thread_pool.map can only pass one argument
-    :param argument:
-    0: path to new image\n
-    1: sorter template\n
-    2: sort criteria\n
-    3: width of image\n
-    4: height of image\n
-    5: mode of image\n
-    6: pixels of image\n
-    """
-    sorter = argument[1].copy()
-    sorter.img_width = argument[3]
-    sorter.img_height = argument[4]
-    sorter.criteria = sort_criteria.all_criteria[argument[2]]
-    if os.path.isfile(argument[0]):
-        return False
-    temp_pixels = [p for p in argument[6]]
-    sorter.sort_pixels(temp_pixels)
-    save_to_img(argument[3], argument[4], argument[5], temp_pixels, argument[0])
-    log.info("Generated " + argument[0])
-    return True
-
-
-def apply_sorters_to_dir(path_to_dir, func_to_call):
-    image_files = get_image_files(path_to_dir)
     log.info("Generating sorted images for:")
-    for image in image_files:
-        log.info("\t" + image)
+    for image in images:
+        log.info("\t" + str(image))
 
-    start_time = time.time()
+    sorters_to_use = get_all_sorters()[:1]
 
-    thread_pool = ThreadPool(processes=2)
-    num_generated_list = thread_pool.map(func_to_call, image_files)
-    thread_pool.close()
-    thread_pool.join()
+    batches = create_batch_queue(images, sorters_to_use)
 
-    stop_time = time.time()
-    time_diff = stop_time - start_time
+    with Timer(log, "Sorting Images"):
+        num_processes = 8
+        jobs = []
+        try:
+            while (not batches.empty()) or len(jobs) > 0:
+                jobs = list(filter(lambda j: j.is_alive(), jobs))
+                if len(jobs) < num_processes and not batches.empty():
+                    batch = batches.get()
+                    process = Process(target=process_batch, args=(batch,))
+                    process.start()
+                    jobs.append(process)
+                    log.info(str(batches.qsize()) + " batches left")
+                else:
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            # TODO print statistics
+            pass
 
-    total_generated = sum(num_generated_list)
-    log.info("Done. Generated " + str(total_generated) + " sorted images in " + str(time_diff) + "s")
-    return total_generated
+
+def create_batch_queue(images: List[PixelImage], sorters_to_use: List[PixelSorter], max_batch_size: int = 10) -> Queue:
+    sorting_images = []
+    for image in images:
+        for sorter in sorters_to_use:
+            for criteria in sort_criteria.all_criteria:
+                sorting_images.append(SortingImage(image, sorter, criteria))
+
+    batches = Queue()
+    current_batch = []
+    for image in sorting_images:
+        current_batch.append(image)
+        if len(current_batch) >= max_batch_size:
+            batches.put(current_batch)
+            current_batch = []
+    return batches
 
 
-def apply_all_sorters_to_dir(path_to_image):
-    return apply_sorters_to_dir(path_to_image, apply_all_sorters_to_image)
+def process_batch(batch: List[SortingImage], statistics: dict = None):
+    # TODO gather statistics
+    try:
+        for img in batch:
+            if os.path.isfile(img.get_new_path()):
+                log.info("Skipping " + img.get_new_path())
+                continue
 
+            img.sort()
+            img.save()
 
-def apply_favorite_sorters_to_dir(path_to_image):
-    return apply_sorters_to_dir(path_to_image, apply_favorite_sorters_to_image)
+            log.info("Saved " + img.get_new_path())
+    except KeyboardInterrupt:
+        pass

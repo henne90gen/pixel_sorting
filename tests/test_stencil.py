@@ -1,8 +1,10 @@
 import logging
 import os
 import unittest
+
 from PIL import Image
-from pixel_sorting.stencils import *
+from pixel_sorting.stencils import Stencil, RectangleStencil, CircleStencil
+
 from tests.test_helper import create_test_image
 
 logging.getLogger().setLevel(logging.ERROR)
@@ -10,7 +12,6 @@ stencil_png = "./stencil.png"
 
 
 class StencilTests(unittest.TestCase):
-
     stencil_pixels = []
     stencil_input_pixels = []
 
@@ -63,7 +64,8 @@ class StencilTests(unittest.TestCase):
     circ_out_result2 = [3, 7, 8, 9, 11, 12, 13, 14, 15, 17, 18, 19, 23]
     circ_out_result3 = [2, 6, 7, 8, 12]
     circ_in = [13, 17, 18, 19, 111, 112, 113, 114, 115, 117, 118, 119, 123]
-    circ_in_result1 = [1, 2, 13, 4, 5, 6, 17, 18, 19, 10, 111, 112, 113, 114, 115, 16, 117, 118, 119, 20, 21, 22, 123, 24, 25]
+    circ_in_result1 = [1, 2, 13, 4, 5, 6, 17, 18, 19, 10, 111, 112, 113, 114, 115, 16, 117, 118, 119, 20, 21, 22, 123,
+                       24, 25]
     circ_in_result2 = [1, 8, 3, 4, 5, 12, 13, 14, 9, 10, 11, 18, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
 
     def testCirlce(self):
