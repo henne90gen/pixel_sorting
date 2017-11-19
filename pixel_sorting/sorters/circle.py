@@ -1,52 +1,53 @@
 import math
 
-import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.sorters.basic import PixelSorter
 
 
 class CircleSorter(PixelSorter):
-    def __init__(self, img_width=0, img_height=0, criteria=sort_criteria.built_in(), reverse=False):
-        super().__init__("CircleSorter", img_width, img_height, criteria, reverse)
-        self.x = int(self.img_width / 2)
-        self.y = int(self.img_height / 2)
-        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
+    def __init__(self, reverse=False):
+        super().__init__("CircleSorter", reverse)
 
-    def copy(self):
-        return CircleSorter(self.img_width, self.img_height, self.criteria, self.reverse)
+    @staticmethod
+    def center(width, height):
+        center_x = int(width / 2)
+        center_y = int(height / 2)
+        return center_x, center_y
 
-    def draw_pixel(self, pixels, temp_pixels, index, x, y):
-        real_x = self.x + x
-        real_y = self.y + y
+    @staticmethod
+    def draw_pixel(pixels, temp_pixels, index, img_width, img_height, x, y):
+        real_x, real_y = CircleSorter.center(img_width, img_height)
+        real_x += x
+        real_y += y
         if real_x < 0 or real_y < 0:
             return 0
-        if real_x >= self.img_width or real_y >= self.img_height:
+        if real_x >= img_width or real_y >= img_height:
             return 0
         if 0 <= index < len(temp_pixels):
-            pixels[self.img_width * real_y + real_x] = temp_pixels[index]
+            pixels[img_width * real_y + real_x] = temp_pixels[index]
             return 1
         return 0
 
-    def draw_octant_pixels(self, pixels, temp_pixels, index, x, y):
-        index += self.draw_pixel(pixels, temp_pixels, index, x, y)
-        index += self.draw_pixel(pixels, temp_pixels, index, -x, y)
+    def draw_octant_pixels(self, pixels, temp_pixels, index, img_width, img_height, x, y):
+        index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, x, y)
+        index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, -x, y)
         if y != 0:
-            index += self.draw_pixel(pixels, temp_pixels, index, -x, -y)
-            index += self.draw_pixel(pixels, temp_pixels, index, x, -y)
+            index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, -x, -y)
+            index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, x, -y)
         if not x == y:
-            index += self.draw_pixel(pixels, temp_pixels, index, y, x)
-            index += self.draw_pixel(pixels, temp_pixels, index, y, -x)
+            index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, y, x)
+            index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, y, -x)
             if y != 0:
-                index += self.draw_pixel(pixels, temp_pixels, index, -y, x)
-                index += self.draw_pixel(pixels, temp_pixels, index, -y, -x)
+                index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, -y, x)
+                index += self.draw_pixel(pixels, temp_pixels, index, img_width, img_height, -y, -x)
         return index
 
-    def draw_circle(self, pixels, temp_pixels, pixel_set, index, radius):
+    def draw_circle(self, pixels, temp_pixels, pixel_set, index, img_width, img_height, radius):
         rad_sq = radius * radius
         cur_x = int(radius)
         cur_y = 0
         while True:
             if cur_y < len(pixel_set) and cur_x < len(pixel_set[cur_y]) and not pixel_set[cur_y][cur_x]:
-                index = self.draw_octant_pixels(pixels, temp_pixels, index, cur_x, cur_y)
+                index = self.draw_octant_pixels(pixels, temp_pixels, index, img_width, img_height, cur_x, cur_y)
                 pixel_set[cur_y][cur_x] = True
             cur_y += 1
             new_x1 = cur_x
@@ -62,29 +63,29 @@ class CircleSorter(PixelSorter):
                 break
         return index
 
-    def sort_pixels(self, pixels):
-        self.x = int(self.img_width / 2)
-        self.y = int(self.img_height / 2)
-        self.max_radius = math.sqrt(self.x * self.x + self.y * self.y)
-        pixels.sort(key=self.criteria, reverse=self.reverse)
+    def sort_pixels(self, pixels, img_width, img_height, criteria):
+        center_x, center_y = CircleSorter.center(img_width, img_height)
+        max_radius = math.sqrt(center_x * center_x + center_y * center_y)
+
+        pixels.sort(key=criteria, reverse=self.reverse)
         temp_pixels = [p for p in pixels]
 
         pixel_set = []
         x_offset = 0
         y_offset = 0
-        if self.img_width % 2 != 0:
+        if img_width % 2 != 0:
             x_offset = 1
-        if self.img_height % 2 != 0:
+        if img_height % 2 != 0:
             y_offset = 1
-        for i in range(self.y + y_offset):
-            temp = [False for _ in range(self.x + x_offset)]
+        for i in range(center_y + y_offset):
+            temp = [False for _ in range(center_x + x_offset)]
             pixel_set.append(temp)
 
         radius = 1
         index = 1
-        self.draw_pixel(pixels, temp_pixels, 0, 0, 0)
-        while radius <= self.max_radius + 1:
-            index = self.draw_circle(pixels, temp_pixels, pixel_set, index, radius)
+        self.draw_pixel(pixels, temp_pixels, 0, 0, img_width, img_height, 0)
+        while radius <= max_radius + 1:
+            index = self.draw_circle(pixels, temp_pixels, pixel_set, index, img_width, img_height, radius)
             radius += 0.5
 
         return pixels

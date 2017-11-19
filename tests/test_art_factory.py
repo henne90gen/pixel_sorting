@@ -1,19 +1,16 @@
-import shutil
-import unittest
 import logging
 import os
+import shutil
+import unittest
 
 from PIL import Image
 
-from pixel_sorting.art_factory import get_generated_image_path
-from pixel_sorting.helper import get_pixels
 from pixel_sorting.sorters.basic import BasicSorter
 from tests.test_helper import assert_generated_directory, create_test_image
 
 logging.getLogger().setLevel(logging.ERROR)
 
 
-@unittest.skip("Art factory has been refactored and tests need to be adjusted")
 class ArtFactoryTest(unittest.TestCase):
     expected_sorters = ['BasicSorter', 'Inverter', 'AlternatingRowSorter1', 'AlternatingRowSorter10',
                         'AlternatingRowSorter100', 'AlternatingColumnSorter1', 'AlternatingColumnSorter10',
@@ -27,6 +24,7 @@ class ArtFactoryTest(unittest.TestCase):
                          "HalfThresholdGreen", "HalfThresholdHue", "HalfThresholdLightness", "HalfThresholdRed",
                          "HalfThresholdSaturation"]
 
+    @unittest.skip("Remove this once new art_factory tests go green")
     def testApplySortersToImage(self):
         art_factory_image = "./applySortersToImage.png"
         create_test_image(art_factory_image, 5, 5, [(i, i, i) for i in range(25)], "RGB")
@@ -39,6 +37,7 @@ class ArtFactoryTest(unittest.TestCase):
             os.remove(art_factory_image)
             shutil.rmtree(image_folder)
 
+    @unittest.skip("Remove this once new art_factory tests go green")
     def testApplySortersToDir(self):
         test_directory = "./applySortersToDir/"
         os.mkdir(test_directory)
@@ -60,6 +59,7 @@ class ArtFactoryTest(unittest.TestCase):
         finally:
             shutil.rmtree(test_directory)
 
+    @unittest.skip("Remove this once new art_factory tests go green")
     def testApplySorterToImage(self):
         image_name = "./applySorterToImage.png"
         create_test_image(image_name, 5, 5, [(i, i, i) for i in range(25)], "RGB")
@@ -68,10 +68,10 @@ class ArtFactoryTest(unittest.TestCase):
         criteria = "BuiltIn"
         extension = ".png"
         test_directory = "./applySorterToImage_generated/"
-        path_to_image = get_generated_image_path(test_directory, sorter_template,
-                                                 criteria, extension)
-        argument = [path_to_image, sorter_template, criteria, image.size[0], image.size[1], image.mode,
-                    get_pixels(image)]
+        # path_to_image = get_generated_image_path(test_directory, sorter_template,
+        #                                          criteria, extension)
+        # argument = [path_to_image, sorter_template, criteria, image.size[0], image.size[1], image.mode,
+        #             get_pixels(image)]
         os.mkdir(test_directory)
 
         try:
@@ -82,6 +82,7 @@ class ArtFactoryTest(unittest.TestCase):
             os.remove(image_name)
             shutil.rmtree(test_directory)
 
+    @unittest.skip("Remove this once new art_factory tests go green")
     def testApplyFavoriteToImage(self):
         test_image = "./applyFavoriteToImage.png"
         pixels = [(i, i, i) for i in range(25)]
@@ -93,6 +94,7 @@ class ArtFactoryTest(unittest.TestCase):
             shutil.rmtree("./applyFavoriteToImage")
             os.remove(test_image)
 
+    @unittest.skip("Remove this once new art_factory tests go green")
     def testApplyFavoriteToDir(self):
         test_dir = "./applyFavoriteToDir"
         os.mkdir(test_dir)
@@ -107,3 +109,19 @@ class ArtFactoryTest(unittest.TestCase):
             pass
         finally:
             shutil.rmtree(test_dir)
+
+    @unittest.skip("Implement this")
+    def testProcessBatch(self):
+        pass
+
+    @unittest.skip("Implement this")
+    def testCreateBatchQueue(self):
+        pass
+
+    @unittest.skip("Implement this")
+    def testRunSortersOnDirectory(self):
+        pass
+
+    @unittest.skip("Implement this")
+    def testGetAllSorters(self):
+        pass

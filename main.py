@@ -1,4 +1,4 @@
-from pixel_sorting.art_factory import *
+from pixel_sorting.art_factory import run_sorters_on_directory
 
 
 def main():

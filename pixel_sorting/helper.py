@@ -1,13 +1,12 @@
 import logging
+import os
+import time
 from typing import List, Callable
 
-import time
 from PIL import Image
-import os
 
 from pixel_sorting import sort_criteria
-
-from pixel_sorting.sorters.basic import PixelSorter
+from pixel_sorting.sorters.basic import PixelSorter, Inverter
 
 image_extensions = ["png", "jpg", "jpeg", ]
 
@@ -20,9 +19,15 @@ class PixelImage:
         self.dir_path = remove_extension(self.file_path)
         self.pixels = pixels
         self.mode = mode
+        self.create_directory()
 
     def __str__(self):
         return "{} ({}x{})".format(self.file_path, self.width, self.height)
+
+    def __eq__(self, other):
+        if type(other) != PixelImage:
+            return False
+        return self.width == other.width and self.height == other.height and self.mode == other.mode and self.pixels == other.pixels and self.file_path == other.file_path
 
     def get_extension(self):
         parts = self.file_path.split(".")
@@ -43,13 +48,13 @@ class SortingImage:
     def get_new_path(self):
         parts = self.pixel_image.file_path.split("/")
         parts[-1] = remove_extension(parts[-1])
-        parts.append(get_sorter_name(type(self.sorter)) + str(self.criteria) + "." + self.pixel_image.get_extension())
+        parts.append(self.sorter.to_string() + str(self.criteria) + "." + self.pixel_image.get_extension())
         return "/".join(parts)
 
     def sort(self):
         self.pixels = [p for p in self.pixel_image.pixels]
-        self.sorter.criteria = sort_criteria.all_criteria[self.criteria]
-        self.pixels = self.sorter.sort_pixels(self.pixels)
+        criteria = sort_criteria.all_criteria[self.criteria]
+        self.pixels = self.sorter.sort_pixels(self.pixels, self.pixel_image.width, self.pixel_image.height, criteria)
 
     def save(self):
         new_image = Image.new(self.pixel_image.mode, (self.pixel_image.width, self.pixel_image.height))
@@ -74,12 +79,6 @@ class Timer:
         self.logger.info("Task '{}' finished after {} seconds".format(self.name, self.end - self.start))
 
 
-def get_extension(path):
-    # FIXME remove this method once refactoring is done (use PixelImage.get_extension instead)
-    parts = path.split(".")
-    return parts[-1]
-
-
 def pixels_to_linear_array(pixels, width, height):
     result = []
     for y in range(height):
@@ -93,12 +92,6 @@ def get_pixels(image):
     width = image.size[0]
     height = image.size[1]
     return pixels_to_linear_array(pixels, width, height)
-
-
-def save_to_copy(img, pixels, filename):
-    width = img.size[0]
-    height = img.size[1]
-    save_to_img(width, height, img.mode, pixels, filename)
 
 
 def save_to_img(width, height, mode, pixels, filename):
@@ -133,11 +126,6 @@ def remove_extension(path):
     return new_path
 
 
-def get_image_files(path_to_dir: str) -> List[str]:
-    files = os.listdir(path_to_dir)
-    return list(map(lambda x: os.path.join(path_to_dir, x), filter(lambda x: is_image_file(x), files)))
-
-
 def get_images(path_to_dir: str) -> List[PixelImage]:
     return list(
         map(create_pixel_image,
@@ -155,8 +143,7 @@ def create_pixel_image(path: str) -> PixelImage:
     return PixelImage(width, height, pixels, path, mode)
 
 
-def get_sorter_name(sorter):
-    result = str(sorter)
-    result = result.split(".")[-1]
-    result = result[:-2]
-    return result
+def get_generated_image_path(image_folder, sorter, criteria, extension):
+    if isinstance(sorter, Inverter):
+        return image_folder + sorter.to_string() + "." + extension
+    return image_folder + sorter.to_string() + criteria + "." + extension

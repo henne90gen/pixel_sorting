@@ -1,17 +1,10 @@
 import math
-
-import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.sorters.basic import PixelSorter
 
 
 class DiamondSorter(PixelSorter):
-    def __init__(self, img_width=0, img_height=0, criteria=sort_criteria.built_in(), reverse=False):
-        super().__init__("DiamondSorter", img_width, img_height, criteria, reverse)
-        self.x = 0
-        self.y = 0
-
-    def copy(self):
-        return DiamondSorter(self.img_width, self.img_height, self.criteria, self.reverse)
+    def __init__(self, reverse=False):
+        super().__init__("DiamondSorter", reverse)
 
     @staticmethod
     def next_position(pos):
@@ -37,22 +30,22 @@ class DiamondSorter(PixelSorter):
         pos = (x, y)
         return pos
 
-    def sort_pixels(self, pixels):
-        self.x = round(self.img_width / 2)
-        self.y = round(self.img_height / 2)
+    def sort_pixels(self, pixels, img_width, img_height, criteria):
+        x = round(img_width / 2)
+        y = round(img_height / 2)
 
-        pixels.sort(key=self.criteria, reverse=self.reverse)
+        pixels.sort(key=criteria, reverse=self.reverse)
 
         temp_pixels = [p for p in pixels]
         index = 0
         pos = (0, 0)
         while True:
-            real_x = pos[0] + self.x
-            real_y = pos[1] + self.y
+            real_x = pos[0] + x
+            real_y = pos[1] + y
             if index >= len(temp_pixels):
                 break
-            if 0 <= real_x < self.img_width and 0 <= real_y < self.img_height:
-                pixels[real_y * self.img_width + real_x] = temp_pixels[index]
+            if 0 <= real_x < img_width and 0 <= real_y < img_height:
+                pixels[real_y * img_width + real_x] = temp_pixels[index]
                 index += 1
             pos = self.next_position(pos)
         return pixels
