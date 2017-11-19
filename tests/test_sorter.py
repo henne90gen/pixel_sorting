@@ -3,7 +3,6 @@ import os
 import unittest
 
 from PIL import Image
-from pexpect import expect
 
 import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.helper import get_pixels
@@ -13,8 +12,7 @@ from pixel_sorting.sorters.circle import CircleSorter
 from pixel_sorting.sorters.column import ColumnSorter, AlternatingColumnSorter
 from pixel_sorting.sorters.diamond import DiamondSorter
 from pixel_sorting.sorters.row import RowSorter, AlternatingRowSorter
-from tests.test_helper import create_test_image, execute_sorter, execute_draw_pixel, execute_draw_octants, \
-    execute_draw_circle
+from tests.test_helper import create_test_image, execute_draw_circle
 
 logging.getLogger().setLevel(logging.ERROR)
 sorters_png = "./sorters.png"
