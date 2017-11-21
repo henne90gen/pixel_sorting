@@ -2,7 +2,6 @@ import logging
 import multiprocessing
 import os
 import time
-from multiprocessing import Process, Pipe
 from queue import Queue
 from typing import List
 
@@ -63,7 +62,7 @@ def run_sorters_on_directory(path_to_dir):
     batches = create_batch_queue(images, sorters_to_use)
 
     with Timer(log, "Sorting Images"):
-        num_processes = 8
+        num_processes = multiprocessing.cpu_count()
         jobs = []
         statistics = {"skipped": 0, "processed": 0, "errors": 0}
         try:
@@ -82,9 +81,9 @@ def run_sorters_on_directory(path_to_dir):
                 if len(jobs) < num_processes and not batches.empty():
                     batch = batches.get()
 
-                    parent_pipe, worker_pipe = Pipe()
+                    parent_pipe, worker_pipe = multiprocessing.Pipe()
 
-                    process = Process(target=process_batch, args=(batch, worker_pipe))
+                    process = multiprocessing.Process(target=process_batch, args=(batch, worker_pipe))
                     process.start()
 
                     jobs.append((process, parent_pipe))
