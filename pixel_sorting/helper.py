@@ -48,7 +48,7 @@ class SortingImage:
     def get_new_path(self):
         parts = self.pixel_image.file_path.split("/")
         parts[-1] = remove_extension(parts[-1])
-        parts.append(self.sorter.to_string() + str(self.criteria) + "." + self.pixel_image.get_extension())
+        parts.append(str(self.sorter) + str(self.criteria) + "." + self.pixel_image.get_extension())
         return "/".join(parts)
 
     def sort(self):

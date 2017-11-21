@@ -1,4 +1,7 @@
 import math
+
+from pixel_sorting import sort_criteria
+
 from pixel_sorting.sorters.basic import PixelSorter
 
 
@@ -30,7 +33,7 @@ class DiamondSorter(PixelSorter):
         pos = (x, y)
         return pos
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         x = round(img_width / 2)
         y = round(img_height / 2)
 

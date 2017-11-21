@@ -1,5 +1,6 @@
 import math
 
+import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.sorters.basic import PixelSorter
 
 
@@ -63,7 +64,7 @@ class CircleSorter(PixelSorter):
                 break
         return index
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         center_x, center_y = CircleSorter.center(img_width, img_height)
         max_radius = math.sqrt(center_x * center_x + center_y * center_y)
 

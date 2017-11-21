@@ -1,15 +1,15 @@
-import pixel_sorting.sort_criteria as sort_criteria
+from pixel_sorting import sort_criteria
 
 
-class PixelSorter(object):
+class PixelSorter:
     def __init__(self, name, reverse=False):
         self.name = name
         self.reverse = reverse
 
-    def to_string(self):
+    def __str__(self):
         return self.name
 
-    def sort_pixels(self, pixels: list, img_width, img_height, criteria) -> list:
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         pass
 
 
@@ -17,7 +17,7 @@ class BasicSorter(PixelSorter):
     def __init__(self, reverse=False):
         super().__init__("BasicSorter", reverse=reverse)
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         pixels.sort(key=criteria, reverse=self.reverse)
         return pixels
 
@@ -26,7 +26,7 @@ class Inverter(PixelSorter):
     def __init__(self):
         super().__init__("Inverter")
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         for i in range(len(pixels)):
             r = 255 - pixels[i][0]
             g = 255 - pixels[i][1]

@@ -24,7 +24,7 @@ class ArtFactoryTest(unittest.TestCase):
                          "HalfThresholdGreen", "HalfThresholdHue", "HalfThresholdLightness", "HalfThresholdRed",
                          "HalfThresholdSaturation"]
 
-    @unittest.skip("Remove this once new art_factory tests go green")
+    @unittest.skip("Make new art_factory tests go green")
     def testApplySortersToImage(self):
         art_factory_image = "./applySortersToImage.png"
         create_test_image(art_factory_image, 5, 5, [(i, i, i) for i in range(25)], "RGB")
@@ -37,7 +37,7 @@ class ArtFactoryTest(unittest.TestCase):
             os.remove(art_factory_image)
             shutil.rmtree(image_folder)
 
-    @unittest.skip("Remove this once new art_factory tests go green")
+    @unittest.skip("Make new art_factory tests go green")
     def testApplySortersToDir(self):
         test_directory = "./applySortersToDir/"
         os.mkdir(test_directory)
@@ -59,7 +59,7 @@ class ArtFactoryTest(unittest.TestCase):
         finally:
             shutil.rmtree(test_directory)
 
-    @unittest.skip("Remove this once new art_factory tests go green")
+    @unittest.skip("Make new art_factory tests go green")
     def testApplySorterToImage(self):
         image_name = "./applySorterToImage.png"
         create_test_image(image_name, 5, 5, [(i, i, i) for i in range(25)], "RGB")
@@ -82,7 +82,7 @@ class ArtFactoryTest(unittest.TestCase):
             os.remove(image_name)
             shutil.rmtree(test_directory)
 
-    @unittest.skip("Remove this once new art_factory tests go green")
+    @unittest.skip("Make new art_factory tests go green")
     def testApplyFavoriteToImage(self):
         test_image = "./applyFavoriteToImage.png"
         pixels = [(i, i, i) for i in range(25)]
@@ -94,7 +94,7 @@ class ArtFactoryTest(unittest.TestCase):
             shutil.rmtree("./applyFavoriteToImage")
             os.remove(test_image)
 
-    @unittest.skip("Remove this once new art_factory tests go green")
+    @unittest.skip("Make new art_factory tests go green")
     def testApplyFavoriteToDir(self):
         test_dir = "./applyFavoriteToDir"
         os.mkdir(test_dir)

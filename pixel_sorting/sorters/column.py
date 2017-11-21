@@ -1,3 +1,5 @@
+from pixel_sorting import sort_criteria
+
 from pixel_sorting.sorters.basic import PixelSorter
 
 
@@ -6,7 +8,7 @@ class ColumnSorter(PixelSorter):
         super().__init__("ColumnSorter", reverse)
         self.column = column
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         sorting = []
         for row in range(img_height):
             sorting.append(pixels[row * img_width + self.column])
@@ -25,7 +27,7 @@ class AlternatingColumnSorter(PixelSorter):
         super().__init__("AlternatingColumnSorter" + str(alternation), reverse)
         self.alternation = alternation
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         reverse = False
         for i in range(img_width):
             column_sorter = ColumnSorter(i, reverse)

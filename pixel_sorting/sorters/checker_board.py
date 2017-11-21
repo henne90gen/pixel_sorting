@@ -5,13 +5,13 @@ from pixel_sorting.stencils import RectangleStencil
 
 class CheckerBoardSorter(PixelSorter):
     def __init__(self, reverse=False, sorter=BasicSorter(), width=8, height=8):
-        super().__init__("CheckerBoardSorter" + str(width) + "x" + str(height) + "(" + sorter.to_string() + ")",
+        super().__init__("CheckerBoardSorter" + str(width) + "x" + str(height) + "(" + str(sorter) + ")",
                          reverse)
         self.width = width
         self.height = height
         self.sorter = sorter
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         for x in range(self.width):
             for y in range(self.height):
                 rect_width = round(img_width / self.width)
@@ -43,7 +43,7 @@ class ExtendedCheckerBoardSorter(PixelSorter):
         self.sorters = sorters
         self.criterias = criterias
 
-    def sort_pixels(self, pixels, img_width, img_height, criteria):
+    def sort_pixels(self, pixels: list, img_width: int, img_height: int, criteria=sort_criteria.built_in()) -> list:
         sorter_index = 0
         criteria_index = 0
 
