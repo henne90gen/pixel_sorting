@@ -69,9 +69,9 @@ class ArtFactoryTest(unittest.TestCase):
 
         for batch in expected:
             actual_batch = actual.get()
-            for index, sorting_image in enumerate(batch):
-                self.assertEqual(sorting_image, actual_batch[index],
-                                 "\nExpected: {}\nActual:   {}".format(sorting_image, actual_batch[index]))
+            for sorting_image in batch:
+                self.assertEqual(sorting_image in actual_batch,
+                                 "\nsorting_image: {}\nactual_batch: {}".format(sorting_image, actual_batch))
         self.assertTrue(actual.empty())
 
     def testRunSortersOnDirectory(self):
@@ -95,7 +95,7 @@ class ArtFactoryTest(unittest.TestCase):
             self.assertEqual(10, len(actual_files))
             print(actual_files)
             for file in expected_files:
-                self.assertTrue(file in actual_files, "{} not in actual_files".format(file))
+                self.assertTrue(file in actual_files, "{} not in actual_files\nactual_files: {}".format(file, actual_files))
         finally:
             shutil.rmtree(path)
 
