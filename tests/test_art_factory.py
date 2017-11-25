@@ -71,7 +71,7 @@ class ArtFactoryTest(unittest.TestCase):
             actual_batch = actual.get()
             for index, sorting_image in enumerate(batch):
                 self.assertEqual(sorting_image, actual_batch[index],
-                                 "Expected: {}\n    Actual: {}".format(sorting_image, actual_batch[index]))
+                                 "\nExpected: {}\nActual:   {}".format(sorting_image, actual_batch[index]))
         self.assertTrue(actual.empty())
 
     def testRunSortersOnDirectory(self):
