@@ -5,49 +5,106 @@ import unittest
 
 from PIL import Image
 
-from pixel_sorting.helper import remove_extension, PixelImage, is_image_file, is_generated_image, get_images
-from pixel_sorting.sorters.basic import PixelSorter
-
-helper_png = "./helper.png"
+from pixel_sorting.helper import remove_extension, PixelImage, is_image_file, is_generated_image, get_images, \
+    SortingImage, create_pixel_image, save_to_image, get_pixels, Timer
+from pixel_sorting.sorters.basic import PixelSorter, BasicSorter
 
 logging.getLogger().setLevel(logging.ERROR)
 
 
 class PixelImageTest(unittest.TestCase):
+    def setUp(self):
+        self.image = PixelImage(0, 0, "hello.jpg", 0)
+
+    def testNotEquals(self):
+        self.assertFalse(self.image == Timer(logging.getLogger(), ""))
+
     def testGetExtension(self):
-        try:
-            self.assertEqual(PixelImage(0, 0, [], "hello.jpg", 0).get_extension(), "jpg")
-        finally:
-            os.rmdir("./hello")
+        expected = "jpg"
+        actual = self.image.get_extension()
+        self.assertEqual(expected, actual)
 
     def testCreateDirectory(self):
-        pass
+        expected_path = "./hello"
+        self.image.create_directory()
+        self.assertTrue(os.path.exists(expected_path))
+        shutil.rmtree(expected_path)
+
+    def testLoadPixels(self):
+        expected = [(1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4)]
+        filename = "test.jpg"
+        mode = "RGB"
+        width = 3
+        height = 3
+        save_to_image(width, height, mode, expected, filename)
+        image = PixelImage(width, height, filename, mode)
+        actual = image.load_pixels()
+        self.assertEqual(expected, actual)
+        os.remove(filename)
 
 
-@unittest.skip("Implement this")
+class PixelImageMock(PixelImage):
+    def __init__(self, file_path="", pixels=None):
+        super().__init__(0, 0, file_path, "RGB")
+        if pixels is None:
+            pixels = []
+        self.pixels = pixels
+
+    def load_pixels(self):
+        return self.pixels
+
+
 class SortingImageTest(unittest.TestCase):
+    def setUp(self):
+        self.sorting_image_path = "./test/BasicSorterBuiltIn.jpg"
+        test_image_path = "./test.jpg"
+        pixel_image = PixelImageMock(test_image_path)
+        sorter = BasicSorter()
+        self.sorting_image = SortingImage(pixel_image, sorter, "BuiltIn")
+
     def testGetNewPath(self):
-        pass
+        expected = self.sorting_image_path
+        actual = self.sorting_image.get_new_path()
+        self.assertEqual(expected, actual)
 
     def testSort(self):
-        pass
+        self.sorting_image.pixel_image = PixelImageMock("test.jpg", [5, 3, 4, 1, 2])
+        expected = [1, 2, 3, 4, 5]
+        self.sorting_image.sort()
+        actual = self.sorting_image.pixels
+        self.assertEqual(expected, actual)
 
     def testSave(self):
-        pass
+        self.sorting_image.pixels = [0, 1, 2, 3]
+        self.sorting_image.pixel_image.width = 2
+        self.sorting_image.pixel_image.height = 2
+        self.sorting_image.save()
+        self.assertTrue(os.path.exists(self.sorting_image_path))
+        shutil.rmtree('test')
 
 
-@unittest.skip("Implement this")
 class TimerTest(unittest.TestCase):
-    def test(self):
-        pass
+    def testTimer(self):
+        expected = ["Starting task 'testTask'", "Task 'testTask' finished after 0.000s"]
+
+        class LoggerMock(logging.Logger):
+            index = 0
+
+            def info(this, msg, **kwargs):
+                self.assertEqual(expected[this.index], msg)
+                this.index += 1
+
+        with Timer(LoggerMock("test"), "testTask"):
+            pass
 
 
 class HelperTest(unittest.TestCase):
     def setUp(self):
-        create_test_image(helper_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        self.helper_png = "./helper.png"
+        create_test_image(self.helper_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
 
     def tearDown(self):
-        os.remove(helper_png)
+        os.remove(self.helper_png)
 
     def testRemoveExtension(self):
         self.assertEqual("hello", remove_extension("hello.jpg"))
@@ -63,20 +120,15 @@ class HelperTest(unittest.TestCase):
         self.assertTrue(is_generated_image("/generated_some_folder/some_image.jpg"))
         self.assertFalse(is_generated_image("./res/city_folder/city.png"))
 
-    @unittest.skip("Implement this")
-    def testGetGeneratedImagePath(self):
-        self.assertTrue(False)
-
-    @unittest.skip("Implement this")
     def testCreatePixelImage(self):
-        self.assertTrue(False)
+        expected = PixelImage(5, 5, "./helper.png", "RGB")
+        actual = create_pixel_image(self.helper_png)
+        self.assertEqual(expected, actual)
 
-    @unittest.skip("Fix this")
     def testGetImages(self):
         test_directory = "./images"
         test_images = ["hello.png", "What.Up", "test.jpg", "hey/here.png"]
-        expected_images = [PixelImage(0, 0, [0], "./images/hello.png", "1"),
-                           PixelImage(0, 0, [0], "./images/test.jpg", "1")]
+        expected_images = [PixelImage(1, 1, "./images/test.jpg", "L"), PixelImage(1, 1, "./images/hello.png", "1")]
 
         try:
             if not os.path.exists(test_directory):
@@ -100,28 +152,25 @@ class HelperTest(unittest.TestCase):
 
             images = get_images(test_directory)
             self.assertEqual(len(expected_images), len(images))
-            for image in expected_images:
-                self.assertTrue(image in images)
+
+            for index, image in enumerate(expected_images):
+                self.assertEqual(image, images[index], "\nExpected: {}\nActual:   {}".format(image, images[index]))
         finally:
             shutil.rmtree(test_directory)
 
-    @unittest.skip("Implement this")
     def testSaveToImage(self):
-        self.assertTrue(False)
+        filename = "./helper.png"
+        expected = [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 0), (7, 0, 0), (8, 0, 0), (9, 0, 0)]
+        save_to_image(3, 3, "RGB", expected, filename)
+        self.assertTrue(os.path.exists(filename))
 
-    @unittest.skip("Implement this")
     def testGetPixels(self):
-        self.assertTrue(False)
-
-    @unittest.skip("Implement this")
-    def testPixelsToLinearArray(self):
-        self.assertTrue(False)
-
-
-def execute_sorter(tester, sorter: PixelSorter, input_pixels, expected_result):
-    test_pixels = [p for p in input_pixels]
-    tester.assertEqual(sorter.sort_pixels(test_pixels), expected_result)
-    tester.assertEqual(test_pixels, expected_result)
+        filename = "./helper.png"
+        expected = [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 0), (7, 0, 0), (8, 0, 0), (9, 0, 0)]
+        save_to_image(3, 3, "RGB", expected, filename)
+        image = Image.open(filename)
+        actual = get_pixels(image)
+        self.assertEqual(expected, actual)
 
 
 def execute_draw_circle(tester, circle_sorter, expected_result, radius, circle_pixels, pixel_source):
@@ -142,6 +191,12 @@ def execute_draw_circle(tester, circle_sorter, expected_result, radius, circle_p
     # end of copy
 
     circle_sorter.draw_circle(test_pixels, pixel_source, pixel_set, 0, 5, 5, radius)
+    tester.assertEqual(test_pixels, expected_result)
+
+
+def execute_sorter(tester, sorter: PixelSorter, input_pixels, expected_result):
+    test_pixels = [p for p in input_pixels]
+    tester.assertEqual(sorter.sort_pixels(test_pixels), expected_result)
     tester.assertEqual(test_pixels, expected_result)
 
 

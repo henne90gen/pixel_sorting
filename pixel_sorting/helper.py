@@ -1,33 +1,39 @@
 import logging
 import os
 import time
-from typing import List, Callable
+from typing import List
 
 from PIL import Image
 
 from pixel_sorting import sort_criteria
-from pixel_sorting.sorters.basic import PixelSorter, Inverter
+from pixel_sorting.sorters.basic import PixelSorter
 
 image_extensions = ["png", "jpg", "jpeg", ]
 
 
 class PixelImage:
-    def __init__(self, width: int, height: int, pixels: list, file_path: str, mode):
+    def __init__(self, width: int, height: int, file_path: str, mode):
         self.width = width
         self.height = height
         self.file_path = file_path
         self.dir_path = remove_extension(self.file_path)
-        self.pixels = pixels
         self.mode = mode
-        self.create_directory()
+        self.pixels = None
 
     def __str__(self):
-        return "{} ({}x{})".format(self.file_path, self.width, self.height)
+        return "{} {} ({}x{})".format(self.file_path, self.mode, self.width, self.height)
 
     def __eq__(self, other):
         if type(other) != PixelImage:
             return False
-        return self.width == other.width and self.height == other.height and self.mode == other.mode and self.pixels == other.pixels and self.file_path == other.file_path
+        return self.width == other.width and self.height == other.height and self.mode == other.mode and self.file_path == other.file_path
+
+    def load_pixels(self) -> list:
+        if self.pixels is None:
+            image = Image.open(self.file_path)
+            self.pixels = get_pixels(image)
+            image.close()
+        return self.pixels
 
     def get_extension(self):
         parts = self.file_path.split(".")
@@ -39,7 +45,7 @@ class PixelImage:
 
 
 class SortingImage:
-    def __init__(self, pixel_image: PixelImage, sorter: PixelSorter, criteria: Callable):
+    def __init__(self, pixel_image: PixelImage, sorter: PixelSorter, criteria: str):
         self.pixel_image = pixel_image
         self.pixels = []
         self.sorter = sorter
@@ -52,11 +58,12 @@ class SortingImage:
         return "/".join(parts)
 
     def sort(self):
-        self.pixels = [p for p in self.pixel_image.pixels]
+        self.pixels = [p for p in self.pixel_image.load_pixels()]
         criteria = sort_criteria.all_criteria[self.criteria]
         self.pixels = self.sorter.sort_pixels(self.pixels, self.pixel_image.width, self.pixel_image.height, criteria)
 
     def save(self):
+        self.pixel_image.create_directory()
         new_image = Image.new(self.pixel_image.mode, (self.pixel_image.width, self.pixel_image.height))
         new_image.putdata(self.pixels)
         new_image.save(self.get_new_path())
@@ -76,10 +83,14 @@ class Timer:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end = time.time()
-        self.logger.info("Task '{}' finished after {} seconds".format(self.name, self.end - self.start))
+        time_difference = self.end - self.start
+        self.logger.info("Task '{}' finished after {:.3f}s".format(self.name, time_difference))
 
 
-def pixels_to_linear_array(pixels, width, height):
+def get_pixels(image):
+    pixels = image.load()
+    width = image.size[0]
+    height = image.size[1]
     result = []
     for y in range(height):
         for x in range(width):
@@ -87,14 +98,7 @@ def pixels_to_linear_array(pixels, width, height):
     return result
 
 
-def get_pixels(image):
-    pixels = image.load()
-    width = image.size[0]
-    height = image.size[1]
-    return pixels_to_linear_array(pixels, width, height)
-
-
-def save_to_img(width, height, mode, pixels, filename):
+def save_to_image(width, height, mode, pixels, filename):
     new_image = Image.new(mode, (width, height))
     new_image.putdata(pixels)
     new_image.save(filename)
@@ -139,11 +143,4 @@ def create_pixel_image(path: str) -> PixelImage:
     mode = image.mode
     width = image.size[0]
     height = image.size[1]
-    pixels = get_pixels(image)
-    return PixelImage(width, height, pixels, path, mode)
-
-
-def get_generated_image_path(image_folder, sorter, criteria, extension):
-    if isinstance(sorter, Inverter):
-        return image_folder + sorter.to_string() + "." + extension
-    return image_folder + sorter.to_string() + criteria + "." + extension
+    return PixelImage(width, height, path, mode)

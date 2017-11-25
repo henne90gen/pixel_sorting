@@ -5,14 +5,18 @@ import time
 from queue import Queue
 from typing import List
 
+import math
+from PIL import Image
+
 import pixel_sorting.sort_criteria as sort_criteria
-from pixel_sorting.helper import get_images, Timer, SortingImage, PixelImage
+from pixel_sorting.helper import get_images, Timer, SortingImage, PixelImage, is_image_file
 from pixel_sorting.sorters.basic import PixelSorter, BasicSorter, Inverter
 from pixel_sorting.sorters.checker_board import CheckerBoardSorter
 from pixel_sorting.sorters.circle import CircleSorter
 from pixel_sorting.sorters.column import AlternatingColumnSorter
 from pixel_sorting.sorters.diamond import DiamondSorter
 from pixel_sorting.sorters.row import AlternatingRowSorter
+from stencils import RectangleStencil
 
 log = logging.getLogger()
 handler = logging.StreamHandler()
@@ -45,19 +49,20 @@ def get_all_sorters() -> List[PixelSorter]:
     return all_sorters
 
 
-def run_sorters_on_directory(path_to_dir):
+def run_all_sorters_on_directory(path_to_dir: str):
+    run_sorters_on_directory(path_to_dir, get_all_sorters())
+
+
+def run_favorite_sorters_on_directory(path_to_dir: str):
+    run_sorters_on_directory(path_to_dir, favorite_sorters)
+
+
+def run_sorters_on_directory(path_to_dir: str, sorters_to_use):
     images = get_images(path_to_dir)
 
     log.info("Generating sorted images for:")
     for image in images:
         log.info("\t" + str(image))
-
-    sorters_to_use = get_all_sorters()
-    # sorters_to_use = favorite_sorters
-    # sorters_to_use = [AlternatingRowSorter(), AlternatingRowSorter(alternation=10),
-    #                   AlternatingRowSorter(alternation=100)]
-    # sorters_to_use = [CircleSorter()]
-    # sorters_to_use = [CheckerBoardSorter(sorter=CircleSorter())]
 
     batches = create_batch_queue(images, sorters_to_use)
 
@@ -142,3 +147,48 @@ def create_batch_queue(images: List[PixelImage], sorters_to_use: List[PixelSorte
             batches.put(current_batch)
             current_batch = []
     return batches
+
+
+# def combine_images(path_to_dir: str):
+#     image_files = list(map(lambda x: os.path.join(path_to_dir, x),
+#                            filter(lambda x: is_image_file(x),
+#                                   os.listdir(path_to_dir))))
+#     mode = None
+#     images = []
+#     for path in image_files:
+#         log.info(path)
+#         image = Image.open(path)
+#         mode = image.mode
+#         width = image.size[0]
+#         height = image.size[1]
+#         images.append(PixelImage(width, height, [], path, mode))
+#
+#     dimension = int(math.sqrt(len(images))) + 1
+#     width = dimension * images[0].width
+#     height = dimension * images[0].height
+#
+#     with Timer(log, "Allocating memory"):
+#         pixels = [0 for _ in range(width * height)]
+#
+#     with Timer(log, "Processing images"):
+#         x = 0
+#         y = 0
+#         for index, image in enumerate(images):
+#             log.info(str(len(images) - index) + " - " + str(image))
+#
+#             stencil = RectangleStencil(width, height, x, y, image.width, image.height)
+#             image_pixels = image.load_pixels()
+#             pixels = stencil.put_in_pixels(pixels, image_pixels)
+#
+#             x += image.width
+#             if x >= width:
+#                 y += image.height
+#                 x = 0
+#
+#             del image_pixels
+#             del image
+#
+#     new_image = Image.new(mode, (width, height))
+#     new_image.putdata(pixels)
+#     new_image.save(os.path.join(path_to_dir, 'overview.jpg'))
+#     new_image.close()
