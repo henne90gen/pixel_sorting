@@ -141,6 +141,10 @@ def create_batch_queue(images: List[PixelImage], sorters_to_use: List[PixelSorte
         if len(current_batch) >= max_batch_size:
             batches.put(current_batch)
             current_batch = []
+
+    if len(current_batch) != 0:
+        batches.put(current_batch)
+
     return batches
 
 # def combine_images(path_to_dir: str):

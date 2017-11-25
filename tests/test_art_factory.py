@@ -55,7 +55,7 @@ class ArtFactoryTest(unittest.TestCase):
         sorters = [BasicSorter()]
         batch_size = 4
         actual = create_batch_queue(images, sorters, batch_size)
-        self.assertEqual(int(len(sort_criteria.all_criteria) / batch_size), actual.qsize())
+        self.assertEqual(int(len(sort_criteria.all_criteria) / batch_size) + 1, actual.qsize())
 
         def make(criteria: str) -> SortingImage:
             return SortingImage(images[0], BasicSorter(), criteria)
@@ -65,20 +65,27 @@ class ArtFactoryTest(unittest.TestCase):
                     [make("Lightness"), make("HalfThresholdBuiltIn"), make("HalfThresholdRed"),
                      make("HalfThresholdGreen")],
                     [make("HalfThresholdBlue"), make("HalfThresholdBrightness"), make("HalfThresholdAverage"),
-                     make("HalfThresholdHue")]]
+                     make("HalfThresholdHue")],
+                    [make("HalfThresholdSaturation"), make("HalfThresholdLightness")]]
 
         for batch in expected:
             actual_batch = actual.get()
             for sorting_image in batch:
-                self.assertEqual(sorting_image in actual_batch,
-                                 "\nsorting_image: {}\nactual_batch: {}".format(sorting_image, actual_batch))
+                self.assertTrue(sorting_image in actual_batch,
+                                "\nsorting_image: {}\nactual_batch: {}".format(sorting_image,
+                                                                               list(map(str, actual_batch))))
         self.assertTrue(actual.empty())
 
     def testRunSortersOnDirectory(self):
-        expected_files = ['BasicSorterHue.jpg', 'BasicSorterRed.jpg', 'BasicSorterBuiltIn.jpg',
-                          'BasicSorterAverage.jpg', 'BasicSorterBrightness.jpg', 'BasicSorterHalfThresholdBuiltIn.jpg',
-                          'BasicSorterGreen.jpg', 'BasicSorterBlue.jpg', 'BasicSorterLightness.jpg',
-                          'BasicSorterSaturation.jpg']
+        expected_files = ['BasicSorterHalfThresholdGreen.jpg', 'BasicSorterHalfThresholdRed.jpg', 'BasicSorterHue.jpg',
+                          'BasicSorterRed.jpg', 'BasicSorterBuiltIn.jpg', 'BasicSorterHalfThresholdLightness.jpg',
+                          'BasicSorterAverage.jpg', 'BasicSorterBrightness.jpg',
+                          'BasicSorterHalfThresholdBrightness.jpg', 'BasicSorterHalfThresholdBuiltIn.jpg',
+                          'BasicSorterGreen.jpg', 'BasicSorterHalfThresholdBlue.jpg',
+                          'BasicSorterHalfThresholdAverage.jpg', 'BasicSorterBlue.jpg',
+                          'BasicSorterHalfThresholdHue.jpg', 'BasicSorterLightness.jpg',
+                          'BasicSorterHalfThresholdSaturation.jpg', 'BasicSorterSaturation.jpg']
+
         path = "./runSortersOnDirectory"
         image_name = "hello"
 
@@ -92,10 +99,10 @@ class ArtFactoryTest(unittest.TestCase):
             self.assertTrue(os.path.exists(expected_path))
 
             actual_files = os.listdir(expected_path)
-            self.assertEqual(10, len(actual_files))
-            print(actual_files)
+            self.assertEqual(18, len(actual_files))
             for file in expected_files:
-                self.assertTrue(file in actual_files, "{} not in actual_files\nactual_files: {}".format(file, actual_files))
+                self.assertTrue(file in actual_files,
+                                "{} not in actual_files\nactual_files: {}".format(file, actual_files))
         finally:
             shutil.rmtree(path)
 
