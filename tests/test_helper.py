@@ -14,13 +14,13 @@ logging.getLogger().setLevel(logging.ERROR)
 
 class PixelImageTest(unittest.TestCase):
     def setUp(self):
-        self.image = PixelImage(0, 0, "hello.jpg", 0)
+        self.image = PixelImage(0, 0, "hello.jpg", "RGB")
 
     def testNotEquals(self):
         self.assertFalse(self.image == Timer(logging.getLogger(), ""))
 
     def testToString(self):
-        expected = "hello.jpg 0 (0x0)"
+        expected = "hello.jpg RGB (0x0)"
         actual = str(self.image)
         self.assertEqual(expected, actual)
 
@@ -66,6 +66,16 @@ class SortingImageTest(unittest.TestCase):
         pixel_image = PixelImageMock(test_image_path)
         sorter = BasicSorter()
         self.sorting_image = SortingImage(pixel_image, sorter, "BuiltIn")
+
+    def testEquals(self):
+        pixel_image = PixelImage(0, 0, "./test.jpg", "RGB")
+        image = SortingImage(pixel_image, BasicSorter(), "BuiltIn")
+        other = SortingImage(pixel_image, BasicSorter(), "BuiltIn")
+        self.assertTrue(image == other)
+        self.assertTrue(image != pixel_image)
+
+    def testToString(self):
+        self.assertEqual("./test.jpg RGB (0x0): BasicSorter BuiltIn", str(self.sorting_image))
 
     def testGetNewPath(self):
         expected = self.sorting_image_path

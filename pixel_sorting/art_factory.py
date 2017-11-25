@@ -5,8 +5,7 @@ import time
 from queue import Queue
 from typing import List
 
-import math
-from PIL import Image
+from multiprocessing.dummy.connection import Connection
 
 import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.helper import get_images, Timer, SortingImage, PixelImage, is_image_file
@@ -16,7 +15,6 @@ from pixel_sorting.sorters.circle import CircleSorter
 from pixel_sorting.sorters.column import AlternatingColumnSorter
 from pixel_sorting.sorters.diamond import DiamondSorter
 from pixel_sorting.sorters.row import AlternatingRowSorter
-from stencils import RectangleStencil
 
 log = logging.getLogger()
 handler = logging.StreamHandler()
@@ -36,7 +34,7 @@ def get_all_sorters() -> List[PixelSorter]:
                         AlternatingColumnSorter(alternation=10), AlternatingColumnSorter(alternation=100),
                         DiamondSorter(), CircleSorter()])
 
-    max_index = len(all_sorters)
+    max_index = len(all_sorters) - 1
     index = 0
     for s in all_sorters:
         if type(s) == Inverter:
@@ -74,12 +72,9 @@ def run_sorters_on_directory(path_to_dir: str, sorters_to_use):
             while (not batches.empty()) or len(jobs) > 0:
                 for _, pipe in jobs:
                     if pipe.poll():
-                        try:
-                            recv_stats = pipe.recv()
-                            for key in recv_stats:
-                                statistics[key] += recv_stats[key]
-                        except EOFError:
-                            pass
+                        recv_stats = pipe.recv()
+                        for key in recv_stats:
+                            statistics[key] += recv_stats[key]
 
                 jobs = list(filter(lambda j: j[0].is_alive(), jobs))
 
@@ -104,7 +99,7 @@ def run_sorters_on_directory(path_to_dir: str, sorters_to_use):
             log.info(msg.format(total, statistics["processed"], statistics["skipped"], statistics["errors"]))
 
 
-def process_batch(batch: List[SortingImage], pipe):
+def process_batch(batch: List[SortingImage], pipe: Connection):
     try:
         skipped = 0
         processed = 0
@@ -147,7 +142,6 @@ def create_batch_queue(images: List[PixelImage], sorters_to_use: List[PixelSorte
             batches.put(current_batch)
             current_batch = []
     return batches
-
 
 # def combine_images(path_to_dir: str):
 #     image_files = list(map(lambda x: os.path.join(path_to_dir, x),

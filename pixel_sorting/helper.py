@@ -12,7 +12,7 @@ image_extensions = ["png", "jpg", "jpeg", ]
 
 
 class PixelImage:
-    def __init__(self, width: int, height: int, file_path: str, mode):
+    def __init__(self, width: int, height: int, file_path: str, mode: str):
         self.width = width
         self.height = height
         self.file_path = file_path
@@ -50,6 +50,14 @@ class SortingImage:
         self.pixels = []
         self.sorter = sorter
         self.criteria = criteria
+
+    def __str__(self):
+        return "{}: {} {}".format(str(self.pixel_image), self.sorter, self.criteria)
+
+    def __eq__(self, other):
+        if type(other) != SortingImage:
+            return False
+        return self.pixel_image == other.pixel_image and self.sorter.name == other.sorter.name and self.criteria == other.criteria
 
     def get_new_path(self):
         parts = self.pixel_image.file_path.split("/")
