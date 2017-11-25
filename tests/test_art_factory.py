@@ -93,6 +93,7 @@ class ArtFactoryTest(unittest.TestCase):
 
             actual_files = os.listdir(expected_path)
             self.assertEqual(10, len(actual_files))
+            print(actual_files)
             for file in expected_files:
                 self.assertTrue(file in actual_files, "{} not in actual_files".format(file))
         finally:
