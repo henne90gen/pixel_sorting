@@ -19,6 +19,11 @@ class PixelImageTest(unittest.TestCase):
     def testNotEquals(self):
         self.assertFalse(self.image == Timer(logging.getLogger(), ""))
 
+    def testToString(self):
+        expected = "hello.jpg 0 (0x0)"
+        actual = str(self.image)
+        self.assertEqual(expected, actual)
+
     def testGetExtension(self):
         expected = "jpg"
         actual = self.image.get_extension()
