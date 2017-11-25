@@ -154,7 +154,7 @@ class HelperTest(unittest.TestCase):
             self.assertEqual(len(expected_images), len(images))
 
             for index, image in enumerate(expected_images):
-                self.assertEqual(image, images[index], "\nExpected: {}\nActual:   {}".format(image, images[index]))
+                self.assertTrue(image in expected_images)
         finally:
             shutil.rmtree(test_directory)
 
