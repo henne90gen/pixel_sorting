@@ -60,18 +60,16 @@ class ArtFactoryTest(unittest.TestCase):
         def make(criteria: str) -> SortingImage:
             return SortingImage(images[0], BasicSorter(), criteria)
 
-        expected = [[make("BuiltIn"), make("Red"), make("Green"), make("Blue")],
-                    [make("Brightness"), make("Average"), make("Hue"), make("Saturation")],
-                    [make("Lightness"), make("HalfThresholdBuiltIn"), make("HalfThresholdRed"),
-                     make("HalfThresholdGreen")],
-                    [make("HalfThresholdBlue"), make("HalfThresholdBrightness"), make("HalfThresholdAverage"),
-                     make("HalfThresholdHue")],
-                    [make("HalfThresholdSaturation"), make("HalfThresholdLightness")]]
+        expected = [make("BuiltIn"), make("Red"), make("Green"), make("Blue"), make("Brightness"), make("Average"),
+                    make("Hue"), make("Saturation"), make("Lightness"), make("HalfThresholdBuiltIn"),
+                    make("HalfThresholdRed"), make("HalfThresholdGreen"), make("HalfThresholdBlue"),
+                    make("HalfThresholdBrightness"), make("HalfThresholdAverage"), make("HalfThresholdHue"),
+                    make("HalfThresholdSaturation"), make("HalfThresholdLightness")]
 
-        for batch in expected:
+        for _ in range(5):
             actual_batch = actual.get()
-            for sorting_image in batch:
-                self.assertTrue(sorting_image in actual_batch,
+            for sorting_image in actual_batch:
+                self.assertTrue(sorting_image in expected,
                                 "\nsorting_image: {}\nactual_batch: {}".format(sorting_image,
                                                                                list(map(str, actual_batch))))
         self.assertTrue(actual.empty())
