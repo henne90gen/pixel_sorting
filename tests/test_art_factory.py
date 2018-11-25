@@ -3,14 +3,11 @@ import os
 import shutil
 import unittest
 
-from PIL import Image
-from multiprocessing.dummy.connection import Connection
-
 import pixel_sorting.sort_criteria as sort_criteria
 from pixel_sorting.art_factory import create_batch_queue, process_batch, get_all_sorters, run_sorters_on_directory
 from pixel_sorting.helper import PixelImage, SortingImage
 from pixel_sorting.sorters.basic import BasicSorter
-from tests.test_helper import assert_generated_directory, create_test_image
+from tests.test_helper import create_test_image
 
 logging.getLogger().setLevel(logging.ERROR)
 
@@ -33,7 +30,7 @@ class ArtFactoryTest(unittest.TestCase):
         filename = "./test.jpg"
         create_test_image(filename, 1, 1, [1], "RGB")
 
-        image = PixelImage(1, 1, filename, "RGB")
+        image = PixelImage(1, 1, filename)
         batch = [SortingImage(image, BasicSorter(), "BuiltIn"), SortingImage(image, BasicSorter(), "Red"),
                  SortingImage(image, BasicSorter(), "Green"), SortingImage(image, BasicSorter(), "Blue")]
 
@@ -51,7 +48,7 @@ class ArtFactoryTest(unittest.TestCase):
             os.remove("./test.jpg")
 
     def testCreateBatchQueue(self):
-        images = [PixelImage(0, 0, "test.jpg", "")]
+        images = [PixelImage(0, 0, "test.jpg")]
         sorters = [BasicSorter()]
         batch_size = 4
         actual = create_batch_queue(images, sorters, batch_size)
@@ -89,7 +86,7 @@ class ArtFactoryTest(unittest.TestCase):
 
         try:
             os.mkdir(path)
-            create_test_image(os.path.join(path, image_name + ".jpg"), 1, 1, [1], "RGB")
+            create_test_image(os.path.join(path, image_name + ".jpg"), [1])
 
             run_sorters_on_directory(path, [BasicSorter()])
 

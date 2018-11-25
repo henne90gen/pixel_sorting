@@ -3,7 +3,8 @@ import os
 import time
 from typing import List
 
-from PIL import Image
+import cv2
+import numpy as np
 
 from pixel_sorting import sort_criteria
 from pixel_sorting.sorters.basic import PixelSorter
@@ -12,27 +13,24 @@ image_extensions = ["png", "jpg", "jpeg", ]
 
 
 class PixelImage:
-    def __init__(self, width: int, height: int, file_path: str, mode: str):
+    def __init__(self, width: int, height: int, file_path: str):
         self.width = width
         self.height = height
         self.file_path = file_path
         self.dir_path = remove_extension(self.file_path)
-        self.mode = mode
         self.pixels = None
 
     def __str__(self):
-        return "{} {} ({}x{})".format(self.file_path, self.mode, self.width, self.height)
+        return f"{self.file_path} ({self.width}x{self.height})"
 
     def __eq__(self, other):
-        if type(other) != PixelImage:
+        if not isinstance(other, PixelImage):
             return False
-        return self.width == other.width and self.height == other.height and self.mode == other.mode and self.file_path == other.file_path
+        return self.width == other.width and self.height == other.height and self.file_path == other.file_path
 
     def load_pixels(self) -> list:
         if self.pixels is None:
-            image = Image.open(self.file_path)
-            self.pixels = get_pixels(image)
-            image.close()
+            self.pixels = cv2.imread(self.file_path)
         return self.pixels
 
     def get_extension(self):
@@ -55,27 +53,26 @@ class SortingImage:
         return "{}: {} {}".format(str(self.pixel_image), self.sorter, self.criteria)
 
     def __eq__(self, other):
-        if type(other) != SortingImage:
+        if not isinstance(other, SortingImage):
             return False
         return self.pixel_image == other.pixel_image and self.sorter.name == other.sorter.name and self.criteria == other.criteria
 
     def get_new_path(self):
         parts = self.pixel_image.file_path.split("/")
         parts[-1] = remove_extension(parts[-1])
-        parts.append(str(self.sorter) + str(self.criteria) + "." + self.pixel_image.get_extension())
+        parts.append(str(self.sorter) + str(self.criteria) +
+                     "." + self.pixel_image.get_extension())
         return "/".join(parts)
 
     def sort(self):
         self.pixels = [p for p in self.pixel_image.load_pixels()]
         criteria = sort_criteria.all_criteria[self.criteria]
-        self.pixels = self.sorter.sort_pixels(self.pixels, self.pixel_image.width, self.pixel_image.height, criteria)
+        self.pixels = self.sorter.sort_pixels(
+            self.pixels, self.pixel_image.width, self.pixel_image.height, criteria)
 
     def save(self):
         self.pixel_image.create_directory()
-        new_image = Image.new(self.pixel_image.mode, (self.pixel_image.width, self.pixel_image.height))
-        new_image.putdata(self.pixels)
-        new_image.save(self.get_new_path())
-        new_image.close()
+        cv2.imwrite(self.get_new_path(), np.array(self.pixels))
 
 
 class Timer:
@@ -92,7 +89,8 @@ class Timer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end = time.time()
         time_difference = self.end - self.start
-        self.logger.info("Task '{}' finished after {:.3f}s".format(self.name, time_difference))
+        self.logger.info("Task '{}' finished after {:.3f}s".format(
+            self.name, time_difference))
 
 
 def get_pixels(image):
@@ -107,10 +105,7 @@ def get_pixels(image):
 
 
 def save_to_image(width, height, mode, pixels, filename):
-    new_image = Image.new(mode, (width, height))
-    new_image.putdata(pixels)
-    new_image.save(filename)
-    new_image.close()
+    cv2.imwrite(filename, np.array(pixels))
 
 
 def is_image_file(filename):
@@ -147,8 +142,7 @@ def get_images(path_to_dir: str) -> List[PixelImage]:
 
 
 def create_pixel_image(path: str) -> PixelImage:
-    image = Image.open(path)
-    mode = image.mode
-    width = image.size[0]
-    height = image.size[1]
-    return PixelImage(width, height, path, mode)
+    pixels = cv2.imread(path)
+    width = pixels.shape[0]
+    height = pixels.shape[1]
+    return PixelImage(width, height, path)

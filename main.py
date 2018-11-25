@@ -1,10 +1,10 @@
-from pixel_sorting.art_factory import run_sorters_on_directory
+from pixel_sorting.art_factory import run_all_sorters_on_directory
+from pixel_sorting.sorters.basic import BasicSorter
 
 
 def main():
-    # apply_favorite_sorters_to_dir("./res")
-    # apply_all_sorters_to_dir("./res")
-    run_sorters_on_directory("./res")
+    run_all_sorters_on_directory("./res")
+    # combine_images('./res/Snapchat-494567457')
 
 
 if __name__ == "__main__":

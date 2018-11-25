@@ -3,24 +3,25 @@ import os
 import shutil
 import unittest
 
-from PIL import Image
+import cv2
+import numpy as np
 
 from pixel_sorting.helper import remove_extension, PixelImage, is_image_file, is_generated_image, get_images, \
     SortingImage, create_pixel_image, save_to_image, get_pixels, Timer
-from pixel_sorting.sorters.basic import PixelSorter, BasicSorter
+from pixel_sorting.sorters.basic import BasicSorter
 
 logging.getLogger().setLevel(logging.ERROR)
 
 
 class PixelImageTest(unittest.TestCase):
     def setUp(self):
-        self.image = PixelImage(0, 0, "hello.jpg", "RGB")
+        self.image = PixelImage(0, 0, "hello.jpg")
 
     def testNotEquals(self):
         self.assertFalse(self.image == Timer(logging.getLogger(), ""))
 
     def testToString(self):
-        expected = "hello.jpg RGB (0x0)"
+        expected = "hello.jpg (0x0)"
         actual = str(self.image)
         self.assertEqual(expected, actual)
 
@@ -36,21 +37,22 @@ class PixelImageTest(unittest.TestCase):
         shutil.rmtree(expected_path)
 
     def testLoadPixels(self):
-        expected = [(1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4), (1, 2, 4)]
+        expected = [[(1, 2, 4), (1, 2, 4), (1, 2, 4)], [
+            (1, 2, 4), (1, 2, 4), (1, 2, 4)], [(1, 2, 4), (1, 2, 4), (1, 2, 4)]]
         filename = "test.jpg"
-        mode = "RGB"
-        width = 3
-        height = 3
-        save_to_image(width, height, mode, expected, filename)
-        image = PixelImage(width, height, filename, mode)
+        save_to_image(0, 0, "", expected, filename)
+        image = PixelImage(3, 3, filename)
         actual = image.load_pixels()
-        self.assertEqual(expected, actual)
+        print(actual)
+        print(expected)
+        for i in range(len(np.array(expected).flat)):
+            self.assertEqual(np.array(expected).flat[i], actual.flat[i])
         os.remove(filename)
 
 
 class PixelImageMock(PixelImage):
     def __init__(self, file_path="", pixels=None):
-        super().__init__(0, 0, file_path, "RGB")
+        super().__init__(0, 0, file_path)
         if pixels is None:
             pixels = []
         self.pixels = pixels
@@ -68,14 +70,15 @@ class SortingImageTest(unittest.TestCase):
         self.sorting_image = SortingImage(pixel_image, sorter, "BuiltIn")
 
     def testEquals(self):
-        pixel_image = PixelImage(0, 0, "./test.jpg", "RGB")
+        pixel_image = PixelImage(0, 0, "./test.jpg")
         image = SortingImage(pixel_image, BasicSorter(), "BuiltIn")
         other = SortingImage(pixel_image, BasicSorter(), "BuiltIn")
         self.assertTrue(image == other)
         self.assertTrue(image != pixel_image)
 
     def testToString(self):
-        self.assertEqual("./test.jpg RGB (0x0): BasicSorter BuiltIn", str(self.sorting_image))
+        self.assertEqual(
+            "./test.jpg (0x0): BasicSorter BuiltIn", str(self.sorting_image))
 
     def testGetNewPath(self):
         expected = self.sorting_image_path
@@ -83,14 +86,15 @@ class SortingImageTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def testSort(self):
-        self.sorting_image.pixel_image = PixelImageMock("test.jpg", [5, 3, 4, 1, 2])
+        self.sorting_image.pixel_image = PixelImageMock(
+            "test.jpg", [5, 3, 4, 1, 2])
         expected = [1, 2, 3, 4, 5]
         self.sorting_image.sort()
         actual = self.sorting_image.pixels
         self.assertEqual(expected, actual)
 
     def testSave(self):
-        self.sorting_image.pixels = [0, 1, 2, 3]
+        self.sorting_image.pixels = [[0, 1, 2], [2, 3, 4]]
         self.sorting_image.pixel_image.width = 2
         self.sorting_image.pixel_image.height = 2
         self.sorting_image.save()
@@ -100,7 +104,8 @@ class SortingImageTest(unittest.TestCase):
 
 class TimerTest(unittest.TestCase):
     def testTimer(self):
-        expected = ["Starting task 'testTask'", "Task 'testTask' finished after 0.000s"]
+        expected = ["Starting task 'testTask'",
+                    "Task 'testTask' finished after 0.000s"]
 
         class LoggerMock(logging.Logger):
             index = 0
@@ -116,7 +121,8 @@ class TimerTest(unittest.TestCase):
 class HelperTest(unittest.TestCase):
     def setUp(self):
         self.helper_png = "./helper.png"
-        create_test_image(self.helper_png, 5, 5, [(i, i, i) for i in range(25)], "RGB")
+        pixels = [[i*5+j for j in range(5)] for i in range(5)]
+        create_test_image(self.helper_png, pixels)
 
     def tearDown(self):
         os.remove(self.helper_png)
@@ -132,18 +138,20 @@ class HelperTest(unittest.TestCase):
             self.assertEqual(is_image_file(test[0]), test[1])
 
     def testIsGeneratedImage(self):
-        self.assertTrue(is_generated_image("/generated_some_folder/some_image.jpg"))
+        self.assertTrue(is_generated_image(
+            "/generated_some_folder/some_image.jpg"))
         self.assertFalse(is_generated_image("./res/city_folder/city.png"))
 
     def testCreatePixelImage(self):
-        expected = PixelImage(5, 5, "./helper.png", "RGB")
+        expected = PixelImage(5, 5, "./helper.png")
         actual = create_pixel_image(self.helper_png)
         self.assertEqual(expected, actual)
 
     def testGetImages(self):
         test_directory = "./images"
         test_images = ["hello.png", "What.Up", "test.jpg", "hey/here.png"]
-        expected_images = [PixelImage(1, 1, "./images/test.jpg", "L"), PixelImage(1, 1, "./images/hello.png", "1")]
+        expected_images = [PixelImage(
+            1, 1, "./images/test.jpg"), PixelImage(1, 1, "./images/hello.png")]
 
         try:
             if not os.path.exists(test_directory):
@@ -158,10 +166,8 @@ class HelperTest(unittest.TestCase):
                         os.makedirs(os.path.join(test_directory, file[:k]))
 
                 if is_image_file(file):
-                    new_image = Image.new("1", (1, 1))
-                    new_image.putdata([0])
-                    new_image.save(new_path)
-                    new_image.close()
+                    self.fail(
+                        "Find out what needs to be done, when we reach this point")
                 else:
                     open(new_path, "w").close()
 
@@ -175,16 +181,17 @@ class HelperTest(unittest.TestCase):
 
     def testSaveToImage(self):
         filename = "./helper.png"
-        expected = [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 0), (7, 0, 0), (8, 0, 0), (9, 0, 0)]
+        expected = [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0),
+                    (5, 0, 0), (6, 0, 0), (7, 0, 0), (8, 0, 0), (9, 0, 0)]
         save_to_image(3, 3, "RGB", expected, filename)
         self.assertTrue(os.path.exists(filename))
 
     def testGetPixels(self):
         filename = "./helper.png"
-        expected = [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 0), (7, 0, 0), (8, 0, 0), (9, 0, 0)]
+        expected = [[(1, 0, 0), (2, 0, 0), (3, 0, 0)], [(4, 0, 0),
+                                                        (5, 0, 0), (6, 0, 0)], [(7, 0, 0), (8, 0, 0), (9, 0, 0)]]
         save_to_image(3, 3, "RGB", expected, filename)
-        image = Image.open(filename)
-        actual = get_pixels(image)
+        actual = cv2.imread(filename)
         self.assertEqual(expected, actual)
 
 
@@ -205,49 +212,11 @@ def execute_draw_circle(tester, circle_sorter, expected_result, radius, circle_p
         pixel_set.append(temp)
     # end of copy
 
-    circle_sorter.draw_circle(test_pixels, pixel_source, pixel_set, 0, 5, 5, radius)
+    circle_sorter.draw_circle(
+        test_pixels, pixel_source, pixel_set, 0, 5, 5, radius)
     tester.assertEqual(test_pixels, expected_result)
 
 
-def execute_sorter(tester, sorter: PixelSorter, input_pixels, expected_result):
-    test_pixels = [p for p in input_pixels]
-    tester.assertEqual(sorter.sort_pixels(test_pixels), expected_result)
-    tester.assertEqual(test_pixels, expected_result)
-
-
-def execute_draw_octants(tester, circle_sorter, x, y, expected_result, expected_index, circle_pixels, pixel_source):
-    test_pixels = [p for p in circle_pixels]
-    tester.assertEqual(circle_sorter.draw_octant_pixels(test_pixels, pixel_source, 0, x, y), expected_index)
-    tester.assertEqual(test_pixels, expected_result)
-
-
-def execute_draw_pixel(tester, circle_sorter, x, y, index, expected_result, expected_return, circle_pixels,
-                       pixel_source):
-    test_pixels = [p for p in circle_pixels]
-    tester.assertEqual(circle_sorter.draw_pixel(test_pixels, pixel_source, index, x, y), expected_return)
-    tester.assertEqual(test_pixels, expected_result)
-
-
-def get_expected_files_per_image(tester):
-    return (len(tester.expected_sorters) - 1) * len(tester.expected_criteria) + 1
-
-
-def create_test_image(filename, width, height, pixels, mode="L"):
-    img = Image.new(mode, (width, height))
-    img.putdata(pixels)
-    img.save(filename)
-
-
-def assert_generated_directory(tester, directory, expected_sorters, expected_criteria, extension):
-    num_expected_files_per_image = get_expected_files_per_image(tester)
-
-    tester.assertTrue(os.path.exists(directory))
-    num_files = len(
-        [name for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name))])
-    tester.assertEqual(num_files, num_expected_files_per_image)
-    for sorter in expected_sorters:
-        for criteria in expected_criteria:
-            image_path = directory + sorter + criteria + extension
-            if sorter == "Inverter":
-                image_path = directory + sorter + extension
-            tester.assertTrue(os.path.exists(image_path), "Image file " + image_path + " does not exist.")
+def create_test_image(path: str, test_pixels: list):
+    pixels = np.array(test_pixels)
+    cv2.imwrite(path, pixels)

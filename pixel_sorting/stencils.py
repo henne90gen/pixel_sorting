@@ -13,16 +13,8 @@ class Stencil(object):
     def cut_out_pixels(self, pixels):
         pass
 
-    def cut_out_image(self, img):
-        return self.cut_out_pixels(get_pixels(img))
-
     def put_in_pixels(self, pixels, rect_pixels):
         pass
-
-    def put_in_image(self, img, rect_pixels):
-        self.img_width = img.size[0]
-        self.img_height = img.size[1]
-        return self.put_in_pixels(get_pixels(img), rect_pixels)
 
 
 class RectangleStencil(Stencil):
@@ -40,7 +32,8 @@ class RectangleStencil(Stencil):
         if self.x + local_width > self.img_width:
             local_width = self.img_width - self.x
         if self.y >= self.img_height or self.x >= self.img_width:
-            raise Exception("Position out of bounds: (" + str(self.x) + "|" + str(self.y) + ")")
+            raise Exception("Position out of bounds: (" +
+                            str(self.x) + "|" + str(self.y) + ")")
 
         for row in range(self.y, self.y + local_height):
             for col in range(self.x, self.x + local_width):
