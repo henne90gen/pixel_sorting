@@ -9,7 +9,7 @@ import numpy as np
 from pixel_sorting import sort_criteria
 from pixel_sorting.sorters.basic import PixelSorter
 
-image_extensions = ["png", "jpg", "jpeg", ]
+image_extensions = ["png", "jpg", "jpeg"]
 
 
 class PixelImage:
@@ -31,6 +31,7 @@ class PixelImage:
     def load_pixels(self) -> list:
         if self.pixels is None:
             self.pixels = cv2.imread(self.file_path)
+        self.pixels = self.pixels.reshape((self.width * self.height, 3))
         return self.pixels
 
     def get_extension(self):
@@ -68,11 +69,12 @@ class SortingImage:
         self.pixels = [p for p in self.pixel_image.load_pixels()]
         criteria = sort_criteria.all_criteria[self.criteria]
         self.pixels = self.sorter.sort_pixels(
-            self.pixels, self.pixel_image.width, self.pixel_image.height, criteria)
+            self.pixels, self.pixel_image.height, self.pixel_image.width, criteria)
 
     def save(self):
         self.pixel_image.create_directory()
-        cv2.imwrite(self.get_new_path(), np.array(self.pixels))
+        cv2.imwrite(self.get_new_path(), np.array(self.pixels).reshape(
+            (self.pixel_image.width, self.pixel_image.height, 3)))
 
 
 class Timer:

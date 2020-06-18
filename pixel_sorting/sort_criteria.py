@@ -1,5 +1,7 @@
 def built_in():
-    return lambda pixel: pixel
+    def ret_lambda(pixel):
+        return tuple(pixel)
+    return ret_lambda
 
 
 def red():
@@ -47,7 +49,7 @@ def lightness():
     Percentage of full lightness
     :return: ranging from 0 to 1
     """
-    return lambda pixel: (max(pixel) / 255 + min(pixel) / 255) / 2
+    return lambda pixel: (max(tuple(pixel)) / 255 + min(tuple(pixel)) / 255) / 2
 
 
 def threshold(criteria, num):
@@ -57,10 +59,11 @@ def threshold(criteria, num):
     :return: result of criteria or 0
     """
     if type(criteria((0, 0, 0))) is tuple:
-        return lambda pixel: pixel
+        return lambda pixel: tuple(pixel)
+
     def ret_lambda(pixel):
-        print(pixel)
-        return criteria(pixel) if criteria(pixel) > num else 0
+        stuff = criteria(tuple(pixel))
+        return stuff if stuff > num else 0
     return ret_lambda
 
 
@@ -75,9 +78,19 @@ def get_half_threshold(crit_str):
         return 0
 
 
-all_criteria = {"BuiltIn": built_in(), "Red": red(), "Green": green(), "Blue": blue(), "Brightness": brightness(),
-                "Average": avg(), "Hue": hue(), "Saturation": saturation(), "Lightness": lightness()}
+all_criteria = {
+    "BuiltIn": built_in(),
+    "Red": red(),
+    # "Green": green(),
+    # "Blue": blue(),
+    # "Brightness": brightness(),
+    # "Average": avg(),
+    # "Hue": hue(),
+    # "Saturation": saturation(),
+    # "Lightness": lightness()
+}
 thresholds = {}
 for crit in all_criteria:
-    thresholds["HalfThreshold" + crit] = threshold(all_criteria[crit], get_half_threshold(crit))
+    thresholds["HalfThreshold" +
+               crit] = threshold(all_criteria[crit], get_half_threshold(crit))
 all_criteria.update(thresholds)

@@ -72,9 +72,12 @@ def run_sorters_on_directory(path_to_dir: str, sorters_to_use: list):
             while (not batches.empty()) or len(jobs) > 0:
                 for _, pipe in jobs:
                     if pipe.poll():
-                        recv_stats = pipe.recv()
-                        for key in recv_stats:
-                            statistics[key] += recv_stats[key]
+                        try:
+                            recv_stats = pipe.recv()
+                            for key in recv_stats:
+                                statistics[key] += recv_stats[key]
+                        except Exception as e:
+                            pass
 
                 jobs = list(filter(lambda j: j[0].is_alive(), jobs))
 
@@ -121,7 +124,6 @@ def process_batch(batch: List[SortingImage], pipe: Connection):
                 errors += 1
                 log.info("Error processing %s", img.get_new_path())
                 log.info(e)
-                raise e
 
         pipe.send({"skipped": skipped, "processed": processed, "errors": errors})
     except KeyboardInterrupt:
@@ -147,47 +149,3 @@ def create_batch_queue(images: List[PixelImage], sorters_to_use: List[PixelSorte
         batches.put(current_batch)
 
     return batches
-
-# def combine_images(path_to_dir: str):
-#     image_files = list(map(lambda x: os.path.join(path_to_dir, x),
-#                            filter(lambda x: is_image_file(x),
-#                                   os.listdir(path_to_dir))))
-#     mode = None
-#     images = []
-#     for path in image_files:
-#         log.info(path)
-#         image = Image.open(path)
-#         mode = image.mode
-#         width = image.size[0]
-#         height = image.size[1]
-#         images.append(PixelImage(width, height, [], path, mode))
-#
-#     dimension = int(math.sqrt(len(images))) + 1
-#     width = dimension * images[0].width
-#     height = dimension * images[0].height
-#
-#     with Timer(log, "Allocating memory"):
-#         pixels = [0 for _ in range(width * height)]
-#
-#     with Timer(log, "Processing images"):
-#         x = 0
-#         y = 0
-#         for index, image in enumerate(images):
-#             log.info(str(len(images) - index) + " - " + str(image))
-#
-#             stencil = RectangleStencil(width, height, x, y, image.width, image.height)
-#             image_pixels = image.load_pixels()
-#             pixels = stencil.put_in_pixels(pixels, image_pixels)
-#
-#             x += image.width
-#             if x >= width:
-#                 y += image.height
-#                 x = 0
-#
-#             del image_pixels
-#             del image
-#
-#     new_image = Image.new(mode, (width, height))
-#     new_image.putdata(pixels)
-#     new_image.save(os.path.join(path_to_dir, 'overview.jpg'))
-#     new_image.close()
