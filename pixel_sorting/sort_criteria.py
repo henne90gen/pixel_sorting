@@ -58,7 +58,10 @@ def threshold(criteria, num):
     """
     if type(criteria((0, 0, 0))) is tuple:
         return lambda pixel: pixel
-    return lambda pixel: criteria(pixel) if criteria(pixel) > num else 0
+    def ret_lambda(pixel):
+        print(pixel)
+        return criteria(pixel) if criteria(pixel) > num else 0
+    return ret_lambda
 
 
 def get_half_threshold(crit_str):

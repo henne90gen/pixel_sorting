@@ -20,7 +20,7 @@ class PixelSorter:
     def sort_pixels(self, pixels: list, img_width: int, img_height: int,
                     criteria=sort_criteria.built_in()) -> list:
         """
-        Abstract method that has to be implemented by any pixel sorter
+        Abstract method that has to be implemented by every pixel sorter
         """
         return pixels
 

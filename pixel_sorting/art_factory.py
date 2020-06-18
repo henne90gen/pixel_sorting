@@ -55,12 +55,12 @@ def run_favorite_sorters_on_directory(path_to_dir: str):
     run_sorters_on_directory(path_to_dir, favorite_sorters)
 
 
-def run_sorters_on_directory(path_to_dir: str, sorters_to_use):
+def run_sorters_on_directory(path_to_dir: str, sorters_to_use: list):
     images = get_images(path_to_dir)
 
     log.info("Generating sorted images for:")
     for image in images:
-        log.info("\t" + str(image))
+        log.info("\t%s", image)
 
     batches = create_batch_queue(images, sorters_to_use)
 
@@ -107,7 +107,7 @@ def process_batch(batch: List[SortingImage], pipe: Connection):
         for img in batch:
             if os.path.isfile(img.get_new_path()):
                 skipped += 1
-                log.info("Skipping " + img.get_new_path())
+                log.info("Skipping %s", img.get_new_path())
                 continue
 
             try:
@@ -116,11 +116,12 @@ def process_batch(batch: List[SortingImage], pipe: Connection):
 
                 processed += 1
 
-                log.info("Saved " + img.get_new_path())
+                log.info("Saved %s", img.get_new_path())
             except Exception as e:
                 errors += 1
-                log.info("Error processing " + img.get_new_path())
-                log.debug(e)
+                log.info("Error processing %s", img.get_new_path())
+                log.info(e)
+                raise e
 
         pipe.send({"skipped": skipped, "processed": processed, "errors": errors})
     except KeyboardInterrupt:
